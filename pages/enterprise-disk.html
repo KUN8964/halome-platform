@@ -45,6 +45,13 @@
 
     /* Org section */
     .org-section { margin-bottom: 32px; }
+    .org-section .section-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .org-section .section-title-row .section-title { margin-bottom: 0; }
     .org-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -70,6 +77,13 @@
     .org-detail-row .detail-link { color: var(--text-link); font-size: 13px; cursor: pointer; }
     .org-detail-row .detail-link:hover { text-decoration: underline; }
 
+    /* Org toolbar */
+    .org-toolbar {
+      display: flex;
+      gap: 8px;
+    }
+    .org-toolbar .btn { font-size: 12px; padding: 6px 14px; }
+
     /* Org tree */
     .org-tree-card {
       background: var(--bg-card);
@@ -77,20 +91,120 @@
       border-radius: var(--radius-lg);
       padding: 24px;
     }
-    .org-tree-card .card-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+    .org-tree-card .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .org-tree-card .card-title { font-size: 16px; font-weight: 600; }
 
     .tree-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 0;
+      padding: 8px 8px 8px 4px;
       font-size: 13px;
       color: var(--text-secondary);
+      position: relative;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition-fast);
     }
-    .tree-item .tree-icon { color: var(--text-muted); }
-    .tree-item .tree-expand { cursor: pointer; font-size: 10px; color: var(--text-muted); }
-    .tree-children { padding-left: 24px; }
+    .tree-item:hover { background: var(--bg-hover); }
+    .tree-item .tree-icon { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+    .tree-item .tree-expand { cursor: pointer; font-size: 10px; color: var(--text-muted); width: 14px; text-align: center; flex-shrink: 0; transition: transform var(--transition-fast); }
+    .tree-item .tree-expand.expanded { transform: rotate(90deg); }
+    .tree-item .tree-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tree-item .tree-count { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
     .tree-item.root { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+    .tree-item.root .tree-icon { color: var(--accent-purple); }
+    .tree-item .add-member-btn {
+      font-size: 11px;
+      color: var(--text-link);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .tree-item:hover .add-member-btn { opacity: 1; }
+    .tree-children { padding-left: 20px; }
+
+    /* Inline context actions */
+    .tree-item-actions {
+      display: flex;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .tree-item:hover .tree-item-actions { opacity: 1; }
+    .tree-item-action {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: all var(--transition-fast);
+      background: transparent;
+      border: none;
+    }
+    .tree-item-action:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .tree-item-action.danger:hover { color: var(--accent-red); background: rgba(239,68,68,0.1); }
+    .tree-item-action.primary:hover { color: var(--accent-purple); background: rgba(139,92,246,0.1); }
+
+    /* Inline rename */
+    .tree-item.renaming .tree-label { display: none; }
+    .tree-item.renaming .tree-item-actions { display: none; }
+    .tree-item.renaming .tree-count { display: none; }
+    .tree-rename-input {
+      display: none;
+      flex: 1;
+      height: 28px;
+      padding: 0 8px;
+      font-size: 13px;
+      background: var(--bg-input);
+      border: 1px solid var(--accent-purple);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      outline: none;
+      min-width: 80px;
+    }
+    .tree-item.renaming .tree-rename-input { display: block; }
+    .tree-item.renaming .tree-rename-actions { display: flex; }
+    .tree-rename-actions {
+      display: none;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .tree-rename-actions button {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all var(--transition-fast);
+    }
+    .tree-rename-confirm { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+    .tree-rename-confirm:hover { background: rgba(16,185,129,0.3); }
+    .tree-rename-cancel { background: rgba(239,68,68,0.1); color: var(--accent-red); }
+    .tree-rename-cancel:hover { background: rgba(239,68,68,0.2); }
+
+    /* Empty tree placeholder */
+    .tree-empty {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .tree-empty .empty-hint { margin-top: 8px; font-size: 12px; color: var(--text-tertiary); }
 
     /* Empty state (unauthenticated) */
     .disk-empty-state {
@@ -107,6 +221,126 @@
     /* State content toggle */
     .state-content { display: none; }
     .state-content.active { display: block; }
+
+    /* Modal form */
+    .modal-form { margin-top: 8px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .form-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      font-size: 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+    .form-input:focus { border-color: var(--accent-purple); }
+    .form-input::placeholder { color: var(--text-tertiary); }
+    .form-select {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      font-size: 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' stroke='%236b7280' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      cursor: pointer;
+    }
+    .form-select:focus { border-color: var(--accent-purple); }
+    .form-error {
+      font-size: 11px;
+      color: var(--accent-red);
+      margin-top: 4px;
+      display: none;
+    }
+    .form-error.show { display: block; }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    /* Delete confirm */
+    .delete-warning {
+      text-align: center;
+      padding: 16px 0;
+    }
+    .delete-warning .warn-icon { font-size: 48px; margin-bottom: 16px; }
+    .delete-warning .warn-title { font-size: 16px; color: var(--text-primary); font-weight: 600; margin-bottom: 8px; }
+    .delete-warning .warn-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .delete-warning .warn-name { color: var(--accent-red); font-weight: 600; }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--text-primary);
+      box-shadow: var(--shadow-lg);
+      animation: toast-in 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 240px;
+    }
+    .toast.success { background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); }
+    .toast.error { background: rgba(239,68,68,0.2); border: 1px solid rgba(239,68,68,0.4); }
+    .toast.info { background: rgba(59,130,246,0.2); border: 1px solid rgba(59,130,246,0.4); }
+    @keyframes toast-in { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* Add member modal */
+    .member-list { max-height: 200px; overflow-y: auto; }
+    .member-check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-secondary);
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .member-check-item:last-child { border-bottom: none; }
+    .member-check-item input[type="checkbox"] {
+      accent-color: var(--accent-purple);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body data-page="enterprise-disk">
@@ -179,7 +413,13 @@
 
           <!-- 组织架构 -->
           <div class="org-section">
-            <h2 class="section-title">组织架构</h2>
+            <div class="section-title-row">
+              <h2 class="section-title">组织架构</h2>
+              <div class="org-toolbar">
+                <button class="btn btn-outline" onclick="openAddOrgModal()">➕ 新增组织</button>
+                <button class="btn btn-primary" onclick="openAddDeptModal()">➕ 添加部门</button>
+              </div>
+            </div>
             <div class="org-grid">
               <div class="org-info-card">
                 <div class="card-title">企业信息</div>
@@ -189,13 +429,12 @@
                 </div>
                 <div class="org-detail-row">
                   <span class="detail-label">成员数量</span>
-                  <span class="detail-value">12 人</span>
+                  <span class="detail-value" id="total-member-count">12 人</span>
                 </div>
                 <div class="org-detail-row">
                   <span class="detail-label">组织管理</span>
                   <span>
-                    <a class="detail-link">添加成员</a>
-                    <a class="detail-link" style="margin-left:12px;">成员管理</a>
+                    <a class="detail-link" onclick="openAddMemberModal()">添加成员</a>
                     <a class="detail-link" style="margin-left:12px;">权限设置</a>
                   </span>
                 </div>
@@ -209,44 +448,12 @@
               </div>
 
               <div class="org-tree-card">
-                <div class="card-title">组织架构</div>
-                <div class="tree-item root">
-                  <span class="tree-icon">🏢</span>
-                  <span>杭州七七八八久久有限公司</span>
+                <div class="card-header">
+                  <span class="card-title">组织架构</span>
+                  <span style="font-size:11px;color:var(--text-tertiary);">拖拽调整层级</span>
                 </div>
-                <div class="tree-children">
-                  <div class="tree-item">
-                    <span class="tree-expand">▶</span>
-                    <span class="tree-icon">👥</span>
-                    <span>技术部</span>
-                    <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">5人</span>
-                  </div>
-                  <div class="tree-children">
-                    <div class="tree-item">
-                      <span class="tree-icon">👤</span>
-                      <span>张三</span>
-                    </div>
-                    <div class="tree-item">
-                      <span class="tree-icon">👤</span>
-                      <span>李四</span>
-                    </div>
-                    <div class="tree-item">
-                      <span class="tree-icon">👤</span>
-                      <span>王五</span>
-                    </div>
-                  </div>
-                  <div class="tree-item">
-                    <span class="tree-expand">▶</span>
-                    <span class="tree-icon">👥</span>
-                    <span>运营部</span>
-                    <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">4人</span>
-                  </div>
-                  <div class="tree-item">
-                    <span class="tree-expand">▶</span>
-                    <span class="tree-icon">👥</span>
-                    <span>管理层</span>
-                    <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">3人</span>
-                  </div>
+                <div id="org-tree">
+                  <!-- Tree rendered by JS -->
                 </div>
               </div>
             </div>
@@ -256,8 +463,552 @@
     </div>
   </div>
 
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 新增组织 Modal -->
+  <div class="modal-overlay" id="modal-add-org" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">新增组织</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-org')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">组织名称</label>
+          <input class="form-input" id="org-name-input" placeholder="请输入组织名称" maxlength="30">
+          <div class="form-error" id="org-name-error">请输入组织名称</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">组织描述（选填）</label>
+          <input class="form-input" id="org-desc-input" placeholder="简要描述该组织" maxlength="100">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-org')">取消</button>
+        <button class="btn btn-primary" onclick="confirmAddOrg()">确认创建</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加部门 Modal -->
+  <div class="modal-overlay" id="modal-add-dept" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">添加部门</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-dept')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">部门名称</label>
+          <input class="form-input" id="dept-name-input" placeholder="请输入部门名称" maxlength="20">
+          <div class="form-error" id="dept-name-error">请输入部门名称</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">上级组织 / 部门</label>
+          <select class="form-select" id="dept-parent-select"></select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-dept')">取消</button>
+        <button class="btn btn-primary" onclick="confirmAddDept()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 重命名确认 Modal（用于带子项的部门） -->
+  <div class="modal-overlay" id="modal-rename" style="display:none;">
+    <div class="modal" style="min-width:400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">重命名</h3>
+        <button class="modal-close" onclick="closeModal('modal-rename')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">新名称</label>
+          <input class="form-input" id="rename-input" maxlength="20">
+          <div class="form-error" id="rename-error">请输入新名称</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-rename')">取消</button>
+        <button class="btn btn-primary" id="rename-confirm-btn">确认修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认 Modal -->
+  <div class="modal-overlay" id="modal-delete" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">删除确认</h3>
+        <button class="modal-close" onclick="closeModal('modal-delete')">✕</button>
+      </div>
+      <div class="delete-warning">
+        <div class="warn-icon">⚠️</div>
+        <div class="warn-title">确定要删除「<span class="warn-name" id="delete-target-name"></span>」吗？</div>
+        <div class="warn-desc" id="delete-target-desc"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-delete')">取消</button>
+        <button class="btn" style="background:var(--accent-red);color:#fff;" onclick="confirmDelete()">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加成员 Modal -->
+  <div class="modal-overlay" id="modal-add-member" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">添加成员到「<span id="add-member-dept-name"></span>」</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-member')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">成员姓名</label>
+          <input class="form-input" id="member-name-input" placeholder="请输入成员姓名" maxlength="10">
+          <div class="form-error" id="member-name-error">请输入成员姓名</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-add-member')">取消</button>
+        <button class="btn btn-primary" onclick="confirmAddMember()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/sidebar.js"></script>
   <script>
+    // ==================== DATA MODEL ====================
+    const orgData = {
+      root: {
+        id: 'org-root',
+        name: '杭州七七八八久久有限公司',
+        type: 'organization',
+        level: 0,
+        children: [
+          {
+            id: 'dept-tech',
+            name: '技术部',
+            type: 'department',
+            level: 1,
+            members: ['张三', '李四', '王五', '赵六', '孙七'],
+            children: []
+          },
+          {
+            id: 'dept-ops',
+            name: '运营部',
+            type: 'department',
+            level: 1,
+            members: ['周八', '吴九', '郑十', '钱十一'],
+            children: []
+          },
+          {
+            id: 'dept-mgmt',
+            name: '管理层',
+            type: 'department',
+            level: 1,
+            members: ['陈总', '刘副总', '黄总监'],
+            children: []
+          }
+        ]
+      }
+    };
+
+    let nextIdCounter = 100;
+    let pendingDeleteTarget = null;
+    let pendingRenameTarget = null;
+
+    function generateId(prefix) {
+      return prefix + '-' + (nextIdCounter++);
+    }
+
+    // ==================== RENDER ====================
+    function renderTree() {
+      const container = document.getElementById('org-tree');
+      if (!orgData.root) {
+        container.innerHTML = '<div class="tree-empty">暂无组织架构<div class="empty-hint">点击"新增组织"开始搭建</div></div>';
+        return;
+      }
+      container.innerHTML = buildTreeHTML(orgData.root);
+      bindTreeEvents();
+      updateMemberCounts();
+    }
+
+    function buildTreeHTML(node) {
+      let html = renderNodeHTML(node);
+      if (node.children && node.children.length > 0) {
+        html += '<div class="tree-children">';
+        node.children.forEach(child => {
+          html += buildTreeHTML(child);
+        });
+        html += '</div>';
+      }
+      return html;
+    }
+
+    function renderNodeHTML(node) {
+      const isRoot = node.type === 'organization';
+      const hasChildren = node.children && node.children.length > 0;
+      const icon = isRoot ? '🏢' : (hasChildren ? '👥' : '🏷️');
+      const cls = isRoot ? 'root' : '';
+      const memberCount = node.type === 'department' ? (node.members ? node.members.length : 0) : null;
+      const subDeptCount = hasChildren ? node.children.length : 0;
+
+      let actionsHTML = '';
+      if (!isRoot) {
+        actionsHTML = `
+          <div class="tree-item-actions">
+            <button class="tree-item-action" title="重命名" onclick="event.stopPropagation();startRename('${node.id}')">✏️</button>
+            ${node.type === 'department' ? `<button class="tree-item-action primary" title="添加子部门" onclick="event.stopPropagation();openAddSubDeptModal('${node.id}')">➕</button>` : ''}
+            <button class="tree-item-action" title="添加成员" onclick="event.stopPropagation();openAddMemberModal('${node.id}')">👤</button>
+            <button class="tree-item-action danger" title="删除" onclick="event.stopPropagation();openDeleteConfirm('${node.id}')">🗑️</button>
+          </div>`;
+      } else {
+        actionsHTML = `
+          <div class="tree-item-actions">
+            <button class="tree-item-action" title="重命名" onclick="event.stopPropagation();startRename('${node.id}')">✏️</button>
+          </div>`;
+      }
+
+      let expandHTML = '';
+      let countHTML = '';
+      if (hasChildren) {
+        expandHTML = '<span class="tree-expand expanded" data-node-id="' + node.id + '">▶</span>';
+        countHTML = `<span class="tree-count">${subDeptCount}个子部门</span>`;
+      } else if (memberCount !== null && memberCount > 0) {
+        countHTML = `<span class="tree-count">${memberCount}人</span>`;
+      }
+
+      return `
+        <div class="tree-item ${cls}" data-node-id="${node.id}" data-node-type="${node.type}" data-node-level="${node.level}">
+          ${expandHTML}
+          <span class="tree-icon">${icon}</span>
+          <span class="tree-label">${escapeHTML(node.name)}</span>
+          <input class="tree-rename-input" value="${escapeHTML(node.name)}" data-node-id="${node.id}" style="display:none;">
+          <span class="tree-rename-actions">
+            <button class="tree-rename-confirm" title="确认" data-node-id="${node.id}">✓</button>
+            <button class="tree-rename-cancel" title="取消" data-node-id="${node.id}">✕</button>
+          </span>
+          ${countHTML}
+          ${actionsHTML}
+        </div>`;
+    }
+
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function updateMemberCounts() {
+      // Update total member count
+      let total = 0;
+      function countMembers(node) {
+        if (node.members) total += node.members.length;
+        if (node.children) node.children.forEach(countMembers);
+      }
+      if (orgData.root) {
+        countMembers(orgData.root);
+        document.getElementById('total-member-count').textContent = total + ' 人';
+      }
+    }
+
+    // ==================== TREE EVENTS ====================
+    function bindTreeEvents() {
+      // Expand/collapse
+      document.querySelectorAll('.tree-expand').forEach(el => {
+        el.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const nodeId = this.dataset.nodeId;
+          const parentItem = this.parentElement;
+          const children = parentItem.nextElementSibling;
+          if (children && children.classList.contains('tree-children')) {
+            const isVisible = children.style.display !== 'none';
+            children.style.display = isVisible ? 'none' : '';
+            this.classList.toggle('expanded', !isVisible);
+          }
+        });
+      });
+
+      // Inline rename confirm
+      document.querySelectorAll('.tree-rename-confirm').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const nodeId = this.dataset.nodeId;
+          commitRename(nodeId);
+        });
+      });
+
+      // Inline rename cancel
+      document.querySelectorAll('.tree-rename-cancel').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const nodeId = this.dataset.nodeId;
+          cancelRename(nodeId);
+        });
+      });
+
+      // Enter key on rename input
+      document.querySelectorAll('.tree-rename-input').forEach(input => {
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            commitRename(this.dataset.nodeId);
+          } else if (e.key === 'Escape') {
+            cancelRename(this.dataset.nodeId);
+          }
+        });
+      });
+    }
+
+    // ==================== RENAME ====================
+    function startRename(nodeId) {
+      const item = document.querySelector(`[data-node-id="${nodeId}"]`);
+      if (!item || item.classList.contains('renaming')) return;
+      item.classList.add('renaming');
+      const input = item.querySelector('.tree-rename-input');
+      if (input) {
+        input.style.display = 'block';
+        input.focus();
+        input.select();
+      }
+    }
+
+    function cancelRename(nodeId) {
+      const item = document.querySelector(`[data-node-id="${nodeId}"]`);
+      if (!item) return;
+      item.classList.remove('renaming');
+      const input = item.querySelector('.tree-rename-input');
+      if (input) {
+        const node = findNode(orgData.root, nodeId);
+        if (node) input.value = node.name;
+        input.style.display = 'none';
+      }
+    }
+
+    function commitRename(nodeId) {
+      const item = document.querySelector(`[data-node-id="${nodeId}"]`);
+      if (!item) return;
+      const input = item.querySelector('.tree-rename-input');
+      if (!input) return;
+      const newName = input.value.trim();
+      if (!newName) {
+        showToast('名称不能为空', 'error');
+        return;
+      }
+      const node = findNode(orgData.root, nodeId);
+      if (node) {
+        const oldName = node.name;
+        node.name = newName;
+        item.classList.remove('renaming');
+        input.style.display = 'none';
+        renderTree();
+        showToast(`「${oldName}」已重命名为「${newName}」`, 'success');
+      }
+    }
+
+    // ==================== ADD ORG ====================
+    function openAddOrgModal() {
+      document.getElementById('org-name-input').value = '';
+      document.getElementById('org-desc-input').value = '';
+      document.getElementById('org-name-error').classList.remove('show');
+      openModal('modal-add-org');
+      setTimeout(() => document.getElementById('org-name-input').focus(), 100);
+    }
+
+    function confirmAddOrg() {
+      const name = document.getElementById('org-name-input').value.trim();
+      if (!name) {
+        document.getElementById('org-name-error').classList.add('show');
+        return;
+      }
+      // If root already exists, we can only have one org — show warning
+      if (orgData.root) {
+        showToast('当前版本仅支持一个组织，请使用"添加部门"来扩展', 'info');
+        closeModal('modal-add-org');
+        return;
+      }
+      orgData.root = {
+        id: generateId('org'),
+        name: name,
+        type: 'organization',
+        level: 0,
+        children: []
+      };
+      closeModal('modal-add-org');
+      renderTree();
+      showToast(`组织「${name}」创建成功`, 'success');
+    }
+
+    // ==================== ADD DEPARTMENT ====================
+    function openAddDeptModal(parentId) {
+      const select = document.getElementById('dept-parent-select');
+      select.innerHTML = '';
+      if (!orgData.root) return;
+      // Add root org as option
+      const rootOpt = document.createElement('option');
+      rootOpt.value = orgData.root.id;
+      rootOpt.textContent = orgData.root.name + '（根组织）';
+      select.appendChild(rootOpt);
+      // Add all departments as potential parents
+      function addDeptOptions(node) {
+        if (node.type === 'department') {
+          const opt = document.createElement('option');
+          opt.value = node.id;
+          const depth = node.level - 1;
+          opt.textContent = ' '.repeat(depth) + node.name;
+          select.appendChild(opt);
+        }
+        if (node.children) node.children.forEach(addDeptOptions);
+      }
+      addDeptOptions(orgData.root);
+      if (parentId) select.value = parentId;
+
+      document.getElementById('dept-name-input').value = '';
+      document.getElementById('dept-name-error').classList.remove('show');
+      openModal('modal-add-dept');
+      setTimeout(() => document.getElementById('dept-name-input').focus(), 100);
+    }
+
+    function openAddSubDeptModal(parentId) {
+      openAddDeptModal(parentId);
+    }
+
+    function confirmAddDept() {
+      const name = document.getElementById('dept-name-input').value.trim();
+      if (!name) {
+        document.getElementById('dept-name-error').classList.add('show');
+        return;
+      }
+      const parentId = document.getElementById('dept-parent-select').value;
+      const parent = findNode(orgData.root, parentId);
+      if (!parent) return;
+
+      const level = parent.level + 1;
+      // Max 2 levels under root (department + sub-department)
+      if (level > 2) {
+        showToast('仅支持二级部门结构，无法继续添加下级', 'error');
+        return;
+      }
+
+      const newDept = {
+        id: generateId('dept'),
+        name: name,
+        type: 'department',
+        level: level,
+        members: [],
+        children: []
+      };
+      if (!parent.children) parent.children = [];
+      parent.children.push(newDept);
+
+      closeModal('modal-add-dept');
+      renderTree();
+      const levelLabel = level === 1 ? '部门' : '子部门';
+      showToast(`${levelLabel}「${name}」已添加到「${parent.name}」下`, 'success');
+    }
+
+    // ==================== DELETE ====================
+    function openDeleteConfirm(nodeId) {
+      const node = findNode(orgData.root, nodeId);
+      if (!node) return;
+      pendingDeleteTarget = nodeId;
+      document.getElementById('delete-target-name').textContent = node.name;
+
+      let desc = '';
+      const childCount = node.children ? node.children.length : 0;
+      const memberCount = node.members ? node.members.length : 0;
+      if (childCount > 0 && memberCount > 0) {
+        desc = `该${node.type === 'department' ? '部门' : '子部门'}下有 ${childCount} 个子部门和 ${memberCount} 名成员，删除后所有子部门和成员将被一并移除。`;
+      } else if (childCount > 0) {
+        desc = `该${node.type === 'department' ? '部门' : '子部门'}下有 ${childCount} 个子部门，删除后所有子部门将被一并移除。`;
+      } else if (memberCount > 0) {
+        desc = `该${node.type === 'department' ? '部门' : '子部门'}下有 ${memberCount} 名成员，删除后所有成员将被移除。`;
+      } else {
+        desc = `删除后不可恢复，确定要继续吗？`;
+      }
+      document.getElementById('delete-target-desc').textContent = desc;
+      openModal('modal-delete');
+    }
+
+    function confirmDelete() {
+      if (!pendingDeleteTarget || !orgData.root) return;
+      // Cannot delete root org
+      if (pendingDeleteTarget === orgData.root.id) {
+        showToast('根组织不可删除', 'error');
+        closeModal('modal-delete');
+        pendingDeleteTarget = null;
+        return;
+      }
+      const node = findNode(orgData.root, pendingDeleteTarget);
+      const nodeName = node ? node.name : '';
+      const removed = removeNode(orgData.root, pendingDeleteTarget);
+      pendingDeleteTarget = null;
+      closeModal('modal-delete');
+      if (removed) {
+        renderTree();
+        showToast(`「${nodeName}」已删除`, 'info');
+      }
+    }
+
+    // ==================== ADD MEMBER ====================
+    function openAddMemberModal(nodeId) {
+      const node = findNode(orgData.root, nodeId);
+      if (!node || node.type === 'organization') return;
+      document.getElementById('add-member-dept-name').textContent = node.name;
+      document.getElementById('member-name-input').value = '';
+      document.getElementById('member-name-error').classList.remove('show');
+      // Store target dept ID
+      document.getElementById('modal-add-member').dataset.deptId = nodeId;
+      openModal('modal-add-member');
+      setTimeout(() => document.getElementById('member-name-input').focus(), 100);
+    }
+
+    function confirmAddMember() {
+      const nodeId = document.getElementById('modal-add-member').dataset.deptId;
+      const name = document.getElementById('member-name-input').value.trim();
+      if (!name) {
+        document.getElementById('member-name-error').classList.add('show');
+        return;
+      }
+      const node = findNode(orgData.root, nodeId);
+      if (!node) return;
+      if (!node.members) node.members = [];
+      node.members.push(name);
+      closeModal('modal-add-member');
+      renderTree();
+      showToast(`成员「${name}」已添加到「${node.name}」`, 'success');
+    }
+
+    // ==================== TREE UTILS ====================
+    function findNode(root, nodeId) {
+      if (!root) return null;
+      if (root.id === nodeId) return root;
+      if (root.children) {
+        for (const child of root.children) {
+          const found = findNode(child, nodeId);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function removeNode(root, nodeId) {
+      if (!root || !root.children) return false;
+      for (let i = 0; i < root.children.length; i++) {
+        if (root.children[i].id === nodeId) {
+          root.children.splice(i, 1);
+          return true;
+        }
+        if (removeNode(root.children[i], nodeId)) return true;
+      }
+      return false;
+    }
+
+    // ==================== STATE SWITCH ====================
     function switchState(state) {
       document.querySelectorAll('.state-toggle .option-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`.state-toggle .option-btn[data-state="${state}"]`).classList.add('active');
@@ -265,17 +1016,40 @@
       document.getElementById('state-' + state).classList.add('active');
     }
 
-    // Tree expand/collapse
-    document.querySelectorAll('.tree-expand').forEach(el => {
-      el.addEventListener('click', function() {
-        const sibling = this.parentElement.nextElementSibling;
-        if (sibling && sibling.classList.contains('tree-children')) {
-          const isVisible = sibling.style.display !== 'none';
-          sibling.style.display = isVisible ? 'none' : 'block';
-          this.textContent = isVisible ? '▶' : '▼';
-        }
-      });
+    // ==================== MODAL UTILS ====================
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    // Close modal on overlay click
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) {
+        e.target.style.display = 'none';
+      }
     });
+
+    // ==================== TOAST ====================
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + (type || 'info');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(20px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // ==================== INIT ====================
+    renderTree();
   </script>
 </body>
 </html>
