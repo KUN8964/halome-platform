@@ -414,6 +414,58 @@
       };
       detail.textContent = texts[tab] || '';
     }
+
+    // 自定义充值弹窗
+    let customRechargeTab = 'cloud-storage';
+    function openCustomRecharge(tab) {
+      customRechargeTab = tab;
+      document.getElementById('custom-recharge-input').value = '';
+      document.getElementById('custom-recharge-tab').textContent = { 'cloud-storage': '云存储', 'evidence': '电子存证', 'cloud-compute': '云计算' }[tab] || '';
+      document.getElementById('modal-custom-recharge').style.display = 'flex';
+      setTimeout(() => document.getElementById('custom-recharge-input').focus(), 100);
+    }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function confirmCustomRecharge() {
+      const amt = parseFloat(document.getElementById('custom-recharge-input').value);
+      if (!amt || amt < 1) { document.getElementById('cr-error').classList.add('show'); return; }
+      document.getElementById('cr-error').classList.remove('show');
+      document.getElementById('modal-custom-recharge').style.display = 'none';
+      const tabLabel = { 'cloud-storage': '云存储', 'evidence': '电子存证', 'cloud-compute': '云计算' }[customRechargeTab];
+      alert('✅ ' + tabLabel + '自定义充值 ¥' + amt.toFixed(2) + ' 已提交');
+    }
+    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+    // Hook "自定义" buttons
+    document.querySelectorAll('.recharge-btn').forEach(btn => {
+      if (btn.textContent.trim() === '自定义') {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const tab = this.closest('.tab-content');
+          const tabId = tab ? tab.id.replace('tab-', '') : 'cloud-storage';
+          openCustomRecharge(tabId);
+        });
+      }
+    });
   </script>
+
+  <div class="modal-overlay" id="modal-custom-recharge" style="display:none;">
+    <div class="modal" style="min-width:400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">自定义充值 · <span id="custom-recharge-tab" style="color:var(--accent-purple-light);">云存储</span></h3>
+        <button class="modal-close" onclick="closeModal('modal-custom-recharge')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">请输入充值金额（元）</label>
+          <input class="form-input" id="custom-recharge-input" type="number" min="1" step="0.01" placeholder="例如：200">
+          <div class="form-error" id="cr-error">请输入有效金额（最低 ¥1）</div>
+        </div>
+        <div class="form-hint">充值金额将直接从账户余额扣除，即刻到账。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-custom-recharge')">取消</button>
+        <button class="btn btn-primary" onclick="confirmCustomRecharge()">确认充值</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

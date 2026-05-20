@@ -32,21 +32,11 @@
       border-bottom: 1px solid var(--border-secondary);
     }
     .info-row:last-child { border-bottom: none; }
-    .info-row .row-label {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .info-row .row-value {
-      font-size: 14px;
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-    .info-row .row-action {
-      font-size: 13px;
-      color: var(--text-link);
-      cursor: pointer;
-    }
+    .info-row .row-label { font-size: 13px; color: var(--text-muted); }
+    .info-row .row-value { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+    .info-row .row-action { font-size: 13px; color: var(--text-link); cursor: pointer; transition: color var(--transition-fast); }
     .info-row .row-action:hover { text-decoration: underline; }
+    .info-row .row-action.danger { color: var(--accent-red); }
 
     .auth-status {
       display: inline-flex;
@@ -56,18 +46,9 @@
       padding: 3px 10px;
       border-radius: var(--radius-full);
     }
-    .auth-status.verified {
-      background: rgba(16, 185, 129, 0.1);
-      color: var(--accent-green);
-    }
-    .auth-status.unverified {
-      background: rgba(245, 158, 11, 0.1);
-      color: var(--accent-yellow);
-    }
-    .auth-status.pending {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--accent-blue);
-    }
+    .auth-status.verified { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+    .auth-status.unverified { background: rgba(245, 158, 11, 0.1); color: var(--accent-yellow); }
+    .auth-status.pending { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); }
 
     .security-item {
       display: grid;
@@ -81,11 +62,7 @@
     .security-item .sec-label { font-size: 14px; color: var(--text-primary); }
     .security-item .sec-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
     .security-item .sec-status { font-size: 13px; color: var(--text-muted); }
-    .security-item .sec-action {
-      font-size: 13px;
-      color: var(--text-link);
-      cursor: pointer;
-    }
+    .security-item .sec-action { font-size: 13px; color: var(--text-link); cursor: pointer; transition: color var(--transition-fast); }
     .security-item .sec-action:hover { text-decoration: underline; }
 
     .device-item {
@@ -107,6 +84,40 @@
       padding: 2px 8px;
       border-radius: var(--radius-sm);
     }
+
+    /* SMS code input */
+    .sms-row {
+      display: flex;
+      gap: 10px;
+    }
+    .sms-row .form-input { flex: 1; }
+    .sms-btn {
+      height: 40px;
+      padding: 0 16px;
+      border: 1px solid var(--accent-purple);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--accent-purple);
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+    }
+    .sms-btn:hover { background: rgba(139,92,246,0.1); }
+    .sms-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Cert detail image placeholder */
+    .cert-preview {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    .cert-preview .cert-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
   </style>
 </head>
 <body data-page="account-info">
@@ -128,25 +139,28 @@
           <div class="card-title">基本信息</div>
           <div class="info-row">
             <span class="row-label">企业/机构名称</span>
-            <span class="row-value">杭州七七八八久久有限公司</span>
-            <span class="row-action">修改</span>
+            <span class="row-value" id="company-name-display">杭州七七八八久久有限公司</span>
+            <span class="row-action" onclick="openModal('modal-edit-name')">修改</span>
           </div>
           <div class="info-row">
             <span class="row-label">认证状态</span>
             <span class="row-value">
               <span class="auth-status verified">✓ 已认证</span>
             </span>
-            <span class="row-action">查看认证</span>
+            <span class="row-action" onclick="openModal('modal-cert-detail')">查看认证</span>
           </div>
           <div class="info-row">
             <span class="row-label">企业码</span>
-            <span class="row-value" style="font-family:monospace;">QSCG</span>
-            <span class="row-action">复制</span>
+            <span class="row-value" style="font-family:monospace;" id="enterprise-code">QSCG</span>
+            <span style="display:flex;align-items:center;gap:6px;">
+              <span class="copy-feedback" id="copy-feedback">✓ 已复制</span>
+              <span class="row-action" onclick="copyEnterpriseCode()">复制</span>
+            </span>
           </div>
           <div class="info-row">
             <span class="row-label">登录手机号</span>
-            <span class="row-value">137 **** 1111</span>
-            <span class="row-action">修改</span>
+            <span class="row-value" id="phone-display">137 **** 1111</span>
+            <span class="row-action" onclick="openModal('modal-edit-phone')">修改</span>
           </div>
         </div>
 
@@ -158,8 +172,8 @@
               <div class="sec-label">短信验证</div>
               <div class="sec-desc">登录及敏感操作时需短信验证</div>
             </div>
-            <span class="sec-status">已开启</span>
-            <span class="sec-action">关闭</span>
+            <span class="sec-status" id="sms-status">已开启</span>
+            <span class="sec-action" id="sms-toggle-action" onclick="toggleSMS()">关闭</span>
           </div>
           <div class="security-item">
             <div>
@@ -167,7 +181,7 @@
               <div class="sec-desc">当前在线</div>
             </div>
             <span class="sec-status">在线</span>
-            <span class="sec-action">下线其他设备</span>
+            <span class="sec-action" onclick="openModal('modal-logout-devices')">下线其他设备</span>
           </div>
         </div>
 
@@ -184,7 +198,7 @@
             </div>
             <span class="device-current">当前设备</span>
           </div>
-          <div class="device-item">
+          <div class="device-item" id="device-iphone">
             <div class="device-info">
               <span class="device-icon">📱</span>
               <div>
@@ -192,13 +206,307 @@
                 <div class="device-detail">杭州 · 最近活跃: 2小时前</div>
               </div>
             </div>
-            <span class="row-action" style="cursor:pointer;color:var(--accent-red);font-size:13px;">下线</span>
+            <span class="row-action danger" onclick="openModal('modal-kick-device')">下线</span>
           </div>
         </div>
       </main>
     </div>
   </div>
 
+  <!-- Toast -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ============== MODALS ============== -->
+
+  <!-- 修改企业名称 -->
+  <div class="modal-overlay" id="modal-edit-name" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">修改企业名称</h3>
+        <button class="modal-close" onclick="closeModal('modal-edit-name')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">企业/机构名称</label>
+          <input class="form-input" id="edit-name-input" placeholder="请输入企业名称" maxlength="30" value="杭州七七八八久久有限公司">
+          <div class="form-error" id="edit-name-error">请输入企业名称</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-edit-name')">取消</button>
+        <button class="btn btn-primary" onclick="confirmEditName()">确认修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 修改手机号 - 步骤1：验证原手机 -->
+  <div class="modal-overlay" id="modal-edit-phone" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">修改登录手机号</h3>
+        <button class="modal-close" onclick="closeModal('modal-edit-phone')">✕</button>
+      </div>
+      <div class="modal-form" id="phone-step-1">
+        <div class="modal-body-text">为保障账户安全，请先验证当前手机号。</div>
+        <div class="form-group">
+          <label class="form-label">当前手机号</label>
+          <div class="form-input" style="line-height:40px;background:var(--bg-secondary);color:var(--text-muted);">137 **** 1111</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">短信验证码</label>
+          <div class="sms-row">
+            <input class="form-input" id="sms-code-old" placeholder="请输入验证码" maxlength="6">
+            <button class="sms-btn" id="sms-btn-old" onclick="sendSMS('old')">获取验证码</button>
+          </div>
+          <div class="form-error" id="sms-old-error">请输入验证码</div>
+        </div>
+      </div>
+      <div class="modal-form" id="phone-step-2" style="display:none;">
+        <div class="modal-body-text">验证通过。请输入新的手机号。</div>
+        <div class="form-group">
+          <label class="form-label">新手机号</label>
+          <input class="form-input" id="phone-new" placeholder="请输入新手机号" maxlength="11">
+          <div class="form-error" id="phone-new-error">请输入有效手机号</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">短信验证码</label>
+          <div class="sms-row">
+            <input class="form-input" id="sms-code-new" placeholder="请输入验证码" maxlength="6">
+            <button class="sms-btn" id="sms-btn-new" onclick="sendSMS('new')">获取验证码</button>
+          </div>
+          <div class="form-error" id="sms-new-error">请输入验证码</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-edit-phone')">取消</button>
+        <button class="btn btn-primary" id="phone-confirm-btn" onclick="confirmEditPhone()">验证</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 认证详情 -->
+  <div class="modal-overlay" id="modal-cert-detail" style="display:none;">
+    <div class="modal" style="min-width:500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">企业认证信息</h3>
+        <button class="modal-close" onclick="closeModal('modal-cert-detail')">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <span class="auth-status verified">✓ 已认证</span>
+        <span style="font-size:12px;color:var(--text-muted);">认证时间：2025-01-15</span>
+      </div>
+      <div class="cert-preview">
+        <div class="cert-icon">📄</div>
+        <div>营业执照认证</div>
+        <div style="font-size:11px;color:var(--text-tertiary);margin-top:4px;">统一社会信用代码：91330100MA2******</div>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="d-label">企业名称</div>
+          <div class="d-value">杭州七七八八久久有限公司</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">企业类型</div>
+          <div class="d-value">有限责任公司</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">法定代表人</div>
+          <div class="d-value">陈**</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">注册资本</div>
+          <div class="d-value">100万元</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">认证方式</div>
+          <div class="d-value">营业执照 + 法人身份认证</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">有效期</div>
+          <div class="d-value">长期</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-cert-detail')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 关闭短信验证确认 -->
+  <div class="modal-overlay" id="modal-sms-off" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">关闭短信验证</h3>
+        <button class="modal-close" onclick="closeModal('modal-sms-off')">✕</button>
+      </div>
+      <div class="confirm-warning">
+        <div class="warn-icon">⚠️</div>
+        <div class="warn-title">确定要关闭短信验证吗？</div>
+        <div class="warn-desc">关闭后，登录及敏感操作将不再需要短信验证码确认，这可能降低账户安全性。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-sms-off')">取消</button>
+        <button class="btn" style="background:var(--accent-red);color:#fff;" onclick="confirmSmsOff()">确认关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下线其他设备确认 -->
+  <div class="modal-overlay" id="modal-logout-devices" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">下线其他设备</h3>
+        <button class="modal-close" onclick="closeModal('modal-logout-devices')">✕</button>
+      </div>
+      <div class="confirm-warning">
+        <div class="warn-icon">📱</div>
+        <div class="warn-title">确定要下线所有其他登录设备吗？</div>
+        <div class="warn-desc">当前设备（MacBook Pro - Chrome）将不受影响。其他设备下次需要重新登录。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-logout-devices')">取消</button>
+        <button class="btn" style="background:var(--accent-yellow);color:#000;" onclick="confirmLogoutDevices()">确认下线</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下线设备确认 -->
+  <div class="modal-overlay" id="modal-kick-device" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">下线设备</h3>
+        <button class="modal-close" onclick="closeModal('modal-kick-device')">✕</button>
+      </div>
+      <div class="confirm-warning">
+        <div class="warn-icon">📱</div>
+        <div class="warn-title">确定要下线「iPhone 15 Pro - Safari」吗？</div>
+        <div class="warn-desc">该设备将被强制登出，下次使用需要重新验证登录。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-kick-device')">取消</button>
+        <button class="btn" style="background:var(--accent-red);color:#fff;" onclick="confirmKickDevice()">确认下线</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/sidebar.js"></script>
+  <script>
+    // ============ MODAL UTILS ============
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; document.querySelectorAll(`#${id} .form-error`).forEach(e => e.classList.remove('show')); }
+    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+
+    // ============ TOAST ============
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + (type || 'info');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      toast.innerHTML = '<span>' + (icons[type]||'ℹ️') + '</span><span>' + message + '</span>';
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+
+    // ============ COPY ============
+    function copyEnterpriseCode() {
+      const code = document.getElementById('enterprise-code').textContent;
+      navigator.clipboard.writeText(code).then(() => {
+        const fb = document.getElementById('copy-feedback');
+        fb.classList.add('show');
+        setTimeout(() => fb.classList.remove('show'), 1500);
+        showToast('企业码已复制到剪贴板', 'success');
+      }).catch(() => showToast('复制失败，请手动复制', 'error'));
+    }
+
+    // ============ EDIT NAME ============
+    function confirmEditName() {
+      const name = document.getElementById('edit-name-input').value.trim();
+      if (!name) { document.getElementById('edit-name-error').classList.add('show'); return; }
+      document.getElementById('company-name-display').textContent = name;
+      closeModal('modal-edit-name');
+      showToast('企业名称已更新', 'success');
+    }
+
+    // ============ EDIT PHONE ============
+    let phoneStep = 1;
+    function confirmEditPhone() {
+      if (phoneStep === 1) {
+        const code = document.getElementById('sms-code-old').value.trim();
+        if (!code) { document.getElementById('sms-old-error').classList.add('show'); return; }
+        // Simulate SMS verify success
+        phoneStep = 2;
+        document.getElementById('phone-step-1').style.display = 'none';
+        document.getElementById('phone-step-2').style.display = 'block';
+        document.getElementById('phone-confirm-btn').textContent = '确认修改';
+        showToast('手机号验证通过', 'success');
+      } else {
+        const phone = document.getElementById('phone-new').value.trim();
+        const code = document.getElementById('sms-code-new').value.trim();
+        if (!phone || phone.length < 11) { document.getElementById('phone-new-error').classList.add('show'); return; }
+        if (!code) { document.getElementById('sms-new-error').classList.add('show'); return; }
+        const masked = phone.substring(0, 3) + ' **** ' + phone.substring(7);
+        document.getElementById('phone-display').textContent = masked;
+        phoneStep = 1;
+        document.getElementById('phone-step-1').style.display = 'block';
+        document.getElementById('phone-step-2').style.display = 'none';
+        document.getElementById('phone-confirm-btn').textContent = '验证';
+        document.getElementById('sms-code-old').value = '';
+        document.getElementById('sms-code-new').value = '';
+        document.getElementById('phone-new').value = '';
+        closeModal('modal-edit-phone');
+        showToast('手机号修改成功', 'success');
+      }
+    }
+
+    let smsTimer = null;
+    function sendSMS(type) {
+      const btn = document.getElementById(type === 'old' ? 'sms-btn-old' : 'sms-btn-new');
+      if (btn.disabled) return;
+      let sec = 60;
+      btn.disabled = true;
+      btn.textContent = sec + 's';
+      showToast('验证码已发送', 'info');
+      smsTimer = setInterval(() => { sec--; btn.textContent = sec + 's'; if (sec <= 0) { clearInterval(smsTimer); btn.disabled = false; btn.textContent = '获取验证码'; } }, 1000);
+    }
+
+    // Reset phone modal on close
+    document.getElementById('modal-edit-phone').addEventListener('transitionend', function() {
+      if (this.style.display === 'none') { /* already closed */ }
+    });
+
+    // ============ SMS TOGGLE ============
+    function toggleSMS() {
+      const status = document.getElementById('sms-status');
+      if (status.textContent === '已开启') {
+        openModal('modal-sms-off');
+      } else {
+        // Turn on
+        document.getElementById('sms-status').textContent = '已开启';
+        document.getElementById('sms-toggle-action').textContent = '关闭';
+        showToast('短信验证已开启', 'success');
+      }
+    }
+
+    function confirmSmsOff() {
+      document.getElementById('sms-status').textContent = '已关闭';
+      document.getElementById('sms-toggle-action').textContent = '开启';
+      closeModal('modal-sms-off');
+      showToast('短信验证已关闭', 'info');
+    }
+
+    // ============ LOGOUT DEVICES ============
+    function confirmLogoutDevices() {
+      closeModal('modal-logout-devices');
+      showToast('其他设备已全部下线', 'success');
+    }
+
+    function confirmKickDevice() {
+      const device = document.getElementById('device-iphone');
+      if (device) device.style.opacity = '0.4';
+      closeModal('modal-kick-device');
+      showToast('「iPhone 15 Pro - Safari」已下线', 'info');
+      setTimeout(() => { if (device) { device.style.transition = 'opacity 0.5s'; device.style.opacity = '0'; setTimeout(() => device.remove(), 500); } }, 1500);
+    }
+  </script>
 </body>
 </html>

@@ -103,6 +103,17 @@
     .model-table .action-links a:hover { text-decoration: underline; }
     .model-table .action-links a.danger { color: var(--accent-red); }
 
+    .recharge-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+    .recharge-option { padding: 14px 10px; background: var(--bg-secondary); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); text-align: center; cursor: pointer; transition: all var(--transition-fast); font-size: 13px; color: var(--text-secondary); }
+    .recharge-option:hover { border-color: var(--accent-purple); background: rgba(139,92,246,0.05); }
+    .recharge-option.selected { border-color: var(--accent-purple); background: rgba(139,92,246,0.08); color: var(--accent-purple-light); font-weight: 600; }
+    .recharge-option .r-price { font-size: 20px; font-weight: 700; }
+    .recharge-option .r-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .sms-row { display: flex; gap: 10px; }
+    .sms-row .form-input { flex: 1; }
+    .sms-btn { height: 40px; padding: 0 16px; border: 1px solid var(--accent-purple); border-radius: var(--radius-md); background: transparent; color: var(--accent-purple); font-size: 13px; cursor: pointer; white-space: nowrap; transition: all var(--transition-fast); }
+    .sms-btn:hover { background: rgba(139,92,246,0.1); }
+
     /* Toggle in table */
     .table-toggle { display: flex; justify-content: center; }
 
@@ -613,6 +624,88 @@
     </div>
   </div>
 
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- 充值弹窗 -->
+  <div class="modal-overlay" id="modal-recharge" style="display:none;">
+    <div class="modal" style="min-width:440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">账户充值</h3>
+        <button class="modal-close" onclick="closeModal('modal-recharge')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">当前余额：<span style="color:var(--accent-purple-light);font-weight:600;">¥ 355.69</span></label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">选择充值金额</label>
+          <div class="recharge-options">
+            <div class="recharge-option" onclick="selectROption(this,100)"><div class="r-price">¥ 100</div></div>
+            <div class="recharge-option" onclick="selectROption(this,200)"><div class="r-price">¥ 200</div></div>
+            <div class="recharge-option selected" onclick="selectROption(this,500)"><div class="r-price">¥ 500</div><div class="r-desc">赠送 ¥50</div></div>
+            <div class="recharge-option" onclick="selectROption(this,1000)"><div class="r-price">¥ 1,000</div><div class="r-desc">赠送 ¥150</div></div>
+            <div class="recharge-option" onclick="selectROption(this,2000)"><div class="r-price">¥ 2,000</div><div class="r-desc">赠送 ¥400</div></div>
+            <div class="recharge-option" onclick="selectROption(this,5000)"><div class="r-price">¥ 5,000</div><div class="r-desc">赠送 ¥1200</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-recharge')">取消</button>
+        <button class="btn btn-primary" onclick="confirmRecharge()">确认充值</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除模型确认 -->
+  <div class="modal-overlay" id="modal-delete-model" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">删除模型</h3>
+        <button class="modal-close" onclick="closeModal('modal-delete-model')">✕</button>
+      </div>
+      <div class="confirm-warning">
+        <div class="warn-icon">⚠️</div>
+        <div class="warn-title">确定要删除「<span class="warn-name" id="delete-model-name"></span>」吗？</div>
+        <div class="warn-desc">删除后模型数据将被永久清除，相关 API 调用将立即失效，已产生的费用不受影响。此操作不可恢复。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-delete-model')">取消</button>
+        <button class="btn" style="background:var(--accent-red);color:#fff;" onclick="confirmDeleteModel()">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key 查看 -->
+  <div class="modal-overlay" id="modal-apikey" style="display:none;">
+    <div class="modal" style="min-width:460px;">
+      <div class="modal-header">
+        <h3 class="modal-title">API Key</h3>
+        <button class="modal-close" onclick="closeModal('modal-apikey')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">模型名称</label>
+          <div class="form-input" style="line-height:40px;background:var(--bg-secondary);" id="apikey-model">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">API Key</label>
+          <div class="sms-row">
+            <div class="form-input font-mono" style="line-height:40px;background:var(--bg-secondary);font-size:12px;" id="apikey-value">sk-••••••••••••••••••••••••</div>
+            <button class="sms-btn" onclick="copyApiKey()">复制</button>
+          </div>
+          <div class="form-hint">请妥善保管，勿泄露给他人</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">接口地址</label>
+          <div class="form-input font-mono" style="line-height:40px;background:var(--bg-secondary);font-size:12px;">https://api.halome.cloud/v1/chat/completions</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-apikey')">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/sidebar.js"></script>
   <script>
     // Model tab switching
@@ -623,6 +716,60 @@
         document.querySelectorAll('.model-tab-content').forEach(c => c.classList.remove('active'));
         this.classList.add('active');
         document.getElementById('model-tab-' + target).classList.add('active');
+      });
+    });
+
+    // ===== MODAL =====
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+
+    function showToast(m, t) {
+      const c = document.getElementById('toast-container'), d = document.createElement('div');
+      d.className = 'toast ' + (t||'info');
+      d.innerHTML = '<span>' + ({success:'✅',error:'❌',info:'ℹ️'}[t]||'ℹ️') + '</span><span>' + m + '</span>';
+      c.appendChild(d);
+      setTimeout(() => { d.style.opacity = '0'; d.style.transform = 'translateX(20px)'; setTimeout(() => d.remove(), 300); }, 2500);
+    }
+
+    // Recharge
+    let rAmount = 500;
+    function selectROption(el, amt) { document.querySelectorAll('.recharge-option').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); rAmount = amt; }
+    function confirmRecharge() { closeModal('modal-recharge'); showToast('充值成功！已到账 ¥' + rAmount, 'success'); }
+
+    // Delete model
+    function delModel(name) { document.getElementById('delete-model-name').textContent = name; openModal('modal-delete-model'); }
+    function confirmDeleteModel() { closeModal('modal-delete-model'); showToast('模型已删除，相关 API Key 已失效', 'info'); }
+
+    // API Key
+    function viewApiKey(modelName) {
+      document.getElementById('apikey-model').textContent = modelName;
+      document.getElementById('apikey-value').textContent = 'sk-' + modelName.replace(/\s/g,'').toLowerCase() + '-halome-2025';
+      openModal('modal-apikey');
+    }
+    function copyApiKey() {
+      const key = document.getElementById('apikey-value').textContent;
+      navigator.clipboard.writeText(key).then(() => showToast('API Key 已复制', 'success')).catch(() => showToast('复制失败', 'error'));
+    }
+
+    // Hook existing action links
+    document.querySelectorAll('.action-links .danger').forEach(a => {
+      a.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const row = this.closest('tr');
+        const name = row ? row.querySelector('.model-name').textContent : '未知模型';
+        delModel(name);
+      });
+    });
+    document.querySelectorAll('.page-header .btn-primary').forEach(b => {
+      if (b.textContent.includes('充值')) b.addEventListener('click', () => openModal('modal-recharge'));
+    });
+    document.querySelectorAll('.cell-link').forEach(a => {
+      a.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const row = this.closest('tr');
+        const name = row ? row.querySelector('.model-name').textContent : '未知模型';
+        viewApiKey(name);
       });
     });
   </script>

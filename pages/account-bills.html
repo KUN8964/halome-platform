@@ -9,7 +9,6 @@
     .bills-page .page-title { margin-bottom: 8px; }
     .bills-page .page-subtitle { margin-bottom: 32px; }
 
-    /* Current plan */
     .current-plan {
       background: var(--bg-card);
       border: 1px solid var(--border-secondary);
@@ -40,41 +39,20 @@
     .plan-item .plan-value { font-size: 18px; font-weight: 600; }
     .plan-item .plan-extra { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-    /* Bill table section */
-    .bill-section {
-      margin-bottom: 32px;
-    }
+    .bill-section { margin-bottom: 32px; }
     .bill-section .section-title { margin-bottom: 16px; }
 
-    /* Filter bar */
     .filter-bar {
       display: flex;
       align-items: center;
       gap: 12px;
       margin-bottom: 16px;
-    }
-    .filter-bar .filter-input {
-      padding: 7px 12px;
-      font-size: 13px;
-      border: 1px solid var(--border-input);
-      border-radius: var(--radius-md);
-      background: var(--bg-input);
-      color: var(--text-primary);
-      outline: none;
-    }
-    .filter-bar .filter-input:focus { border-color: var(--accent-purple); }
-    .filter-bar .filter-select {
-      padding: 7px 12px;
-      font-size: 13px;
-      border: 1px solid var(--border-input);
-      border-radius: var(--radius-md);
-      background: var(--bg-input);
-      color: var(--text-secondary);
-      outline: none;
-      cursor: pointer;
+      flex-wrap: wrap;
     }
 
     .bill-table th, .bill-table td { padding: 14px 16px; }
+    .bill-table tbody tr { cursor: pointer; transition: background var(--transition-fast); }
+    .bill-table tbody tr:hover { background: var(--bg-hover); }
     .bill-table .order-id { font-family: monospace; font-size: 12px; color: var(--text-muted); }
     .bill-table .amount { font-weight: 500; color: var(--text-primary); }
     .bill-table .bill-status {
@@ -86,6 +64,36 @@
     .bill-status.paid { color: var(--accent-green); }
     .bill-status.pending { color: var(--accent-yellow); }
     .bill-status.cancelled { color: var(--text-muted); }
+
+    /* Invoice section in modal */
+    .invoice-detail { margin: 16px 0; }
+    .invoice-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-secondary);
+      font-size: 13px;
+    }
+    .invoice-row .inv-label { color: var(--text-muted); }
+    .invoice-row .inv-value { color: var(--text-primary); font-weight: 500; }
+
+    /* Plan badge */
+    .plan-badge-current {
+      font-size: 11px;
+      color: var(--accent-purple);
+      background: rgba(139,92,246,0.1);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      margin-top: 6px;
+    }
+
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
   </style>
 </head>
 <body data-page="account-bills">
@@ -102,11 +110,10 @@
         <h1 class="page-title">账单与发票</h1>
         <p class="page-subtitle">查看您的消费账单和套餐信息</p>
 
-        <!-- 当前套餐 -->
         <div class="current-plan">
           <div class="plan-header">
-            <div class="plan-title">当前套餐</div>
-            <button class="btn btn-sm btn-primary">升级套餐</button>
+            <div class="plan-title">当前套餐 <span style="font-size:12px;color:var(--accent-purple);margin-left:8px;">专业版</span></div>
+            <button class="btn btn-sm btn-primary" onclick="openModal('modal-upgrade-plan')">升级套餐</button>
           </div>
           <div class="plan-grid">
             <div class="plan-item">
@@ -132,30 +139,29 @@
           </div>
         </div>
 
-        <!-- 账单列表 -->
         <div class="bill-section">
           <h2 class="section-title">账单明细</h2>
-
           <div class="filter-bar">
-            <select class="filter-select">
+            <select class="form-select" style="width:auto;">
               <option>全部时间</option>
               <option>最近7天</option>
               <option>最近30天</option>
               <option>最近3个月</option>
             </select>
-            <select class="filter-select">
+            <select class="form-select" style="width:auto;">
               <option>全部服务</option>
               <option>云存储</option>
               <option>AI推理</option>
               <option>数据存证</option>
             </select>
-            <select class="filter-select">
+            <select class="form-select" style="width:auto;">
               <option>全部状态</option>
               <option>已支付</option>
               <option>待支付</option>
               <option>已取消</option>
             </select>
-            <input class="filter-input" placeholder="搜索订单号..." style="width:200px;">
+            <input class="form-input" placeholder="搜索订单号..." style="width:200px;height:36px;">
+            <button class="btn btn-outline btn-sm" style="height:36px;" onclick="showToast('筛选结果已更新', 'info')">查询</button>
           </div>
 
           <table class="data-table bill-table">
@@ -167,64 +173,63 @@
                 <th>实付金额</th>
                 <th>时间</th>
                 <th>状态</th>
+                <th>操作</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr onclick="openOrderDetail('ORD202505200001','云存储','标准存储 100GB · 月付','¥ 99.00','2025-05-20','paid')">
                 <td class="order-id">ORD202505200001</td>
                 <td>云存储</td>
                 <td class="cell-muted">标准存储 100GB · 月付</td>
                 <td class="amount">¥ 99.00</td>
                 <td class="cell-muted">2025-05-20</td>
                 <td><span class="bill-status paid">● 已支付</span></td>
+                <td><span class="row-action" style="color:var(--text-link);cursor:pointer;">发票</span></td>
               </tr>
-              <tr>
+              <tr onclick="openOrderDetail('ORD202505150002','AI推理','Token消耗 · 按量计费','¥ 456.69','2025-05-15','paid')">
                 <td class="order-id">ORD202505150002</td>
                 <td>AI推理</td>
                 <td class="cell-muted">Token消耗 · 按量计费</td>
                 <td class="amount">¥ 456.69</td>
                 <td class="cell-muted">2025-05-15</td>
                 <td><span class="bill-status paid">● 已支付</span></td>
+                <td><span class="row-action" style="color:var(--text-link);cursor:pointer;">发票</span></td>
               </tr>
-              <tr>
+              <tr onclick="openOrderDetail('ORD202505100003','数据存证','存证服务 · 50次','¥ 200.00','2025-05-10','paid')">
                 <td class="order-id">ORD202505100003</td>
                 <td>数据存证</td>
                 <td class="cell-muted">存证服务 · 50次</td>
                 <td class="amount">¥ 200.00</td>
                 <td class="cell-muted">2025-05-10</td>
                 <td><span class="bill-status paid">● 已支付</span></td>
+                <td><span class="row-action" style="color:var(--text-link);cursor:pointer;">发票</span></td>
               </tr>
-              <tr>
+              <tr onclick="openOrderDetail('ORD202505050004','云存储','数据取回 100GB · 月付','¥ 49.00','2025-05-05','paid')">
                 <td class="order-id">ORD202505050004</td>
                 <td>云存储</td>
                 <td class="cell-muted">数据取回 100GB · 月付</td>
                 <td class="amount">¥ 49.00</td>
                 <td class="cell-muted">2025-05-05</td>
                 <td><span class="bill-status paid">● 已支付</span></td>
+                <td><span class="row-action" style="color:var(--text-link);cursor:pointer;">发票</span></td>
               </tr>
-              <tr>
+              <tr onclick="openOrderDetail('ORD202505010005','AI推理','模型部署 · 月付','¥ 551.00','2025-05-01','paid')">
                 <td class="order-id">ORD202505010005</td>
                 <td>AI推理</td>
                 <td class="cell-muted">模型部署 · 月付</td>
                 <td class="amount">¥ 551.00</td>
                 <td class="cell-muted">2025-05-01</td>
                 <td><span class="bill-status paid">● 已支付</span></td>
+                <td><span class="row-action" style="color:var(--text-link);cursor:pointer;">发票</span></td>
               </tr>
-              <tr>
-                <td class="order-id">ORD202504250006</td>
-                <td>云存储</td>
-                <td class="cell-muted">标准存储 100GB · 月付</td>
-                <td class="amount">¥ 99.00</td>
-                <td class="cell-muted">2025-04-25</td>
-                <td><span class="bill-status paid">● 已支付</span></td>
-              </tr>
-              <tr>
+              <tr onclick="openOrderDetail('ORD202504200007','数据存证','实时出证 · 20次','¥ 150.00','2025-04-20','cancelled')">
                 <td class="order-id">ORD202504200007</td>
                 <td>数据存证</td>
                 <td class="cell-muted">实时出证 · 20次</td>
                 <td class="amount">¥ 150.00</td>
                 <td class="cell-muted">2025-04-20</td>
                 <td><span class="bill-status cancelled">● 已取消</span></td>
+                <td><span class="row-action" style="color:var(--text-muted);cursor:pointer;">-</span></td>
               </tr>
             </tbody>
           </table>
@@ -242,6 +247,154 @@
     </div>
   </div>
 
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ============== MODALS ============== -->
+
+  <!-- 升级套餐 -->
+  <div class="modal-overlay" id="modal-upgrade-plan" style="display:none;">
+    <div class="modal" style="min-width:620px;">
+      <div class="modal-header">
+        <h3 class="modal-title">升级套餐</h3>
+        <button class="modal-close" onclick="closeModal('modal-upgrade-plan')">✕</button>
+      </div>
+      <div class="plan-cards">
+        <div class="plan-card" onclick="selectPlan(this)">
+          <div class="plan-name">基础版</div>
+          <div class="plan-price">¥ 99<span class="plan-unit">/月</span></div>
+          <div class="plan-specs">
+            存储 50 GB<br>
+            取回 50 GB<br>
+            Token 500K/250K<br>
+            支持 1 个模型部署
+          </div>
+        </div>
+        <div class="plan-card selected" onclick="selectPlan(this)">
+          <div class="plan-name">专业版</div>
+          <div class="plan-price">¥ 299<span class="plan-unit">/月</span></div>
+          <div class="plan-specs">
+            存储 100 GB<br>
+            取回 100 GB<br>
+            Token 1,000K/500K<br>
+            支持 5 个模型部署
+          </div>
+          <span class="plan-badge-current">当前套餐</span>
+        </div>
+        <div class="plan-card" onclick="selectPlan(this)">
+          <div class="plan-name">企业版</div>
+          <div class="plan-price">¥ 999<span class="plan-unit">/月</span></div>
+          <div class="plan-specs">
+            存储 500 GB<br>
+            取回 500 GB<br>
+            Token 5,000K/2,500K<br>
+            支持 20 个模型部署
+          </div>
+        </div>
+        <div class="plan-card" onclick="selectPlan(this)">
+          <div class="plan-name">旗舰版</div>
+          <div class="plan-price">¥ 2,999<span class="plan-unit">/月</span></div>
+          <div class="plan-specs">
+            存储 2 TB<br>
+            取回 2 TB<br>
+            Token 50,000K/25,000K<br>
+            无限制模型部署
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-upgrade-plan')">取消</button>
+        <button class="btn btn-primary" onclick="confirmUpgrade()">确认升级</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 订单详情 -->
+  <div class="modal-overlay" id="modal-order-detail" style="display:none;">
+    <div class="modal" style="min-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">订单详情</h3>
+        <button class="modal-close" onclick="closeModal('modal-order-detail')">✕</button>
+      </div>
+      <div class="invoice-detail">
+        <div class="invoice-row">
+          <span class="inv-label">订单编号</span>
+          <span class="inv-value font-mono" id="detail-order-id">-</span>
+        </div>
+        <div class="invoice-row">
+          <span class="inv-label">服务名称</span>
+          <span class="inv-value" id="detail-service">-</span>
+        </div>
+        <div class="invoice-row">
+          <span class="inv-label">服务内容</span>
+          <span class="inv-value" id="detail-content">-</span>
+        </div>
+        <div class="invoice-row">
+          <span class="inv-label">实付金额</span>
+          <span class="inv-value" style="font-size:18px;color:var(--accent-purple-light);" id="detail-amount">-</span>
+        </div>
+        <div class="invoice-row">
+          <span class="inv-label">交易时间</span>
+          <span class="inv-value" id="detail-time">-</span>
+        </div>
+        <div class="invoice-row">
+          <span class="inv-label">支付方式</span>
+          <span class="inv-value">账户余额</span>
+        </div>
+        <div class="invoice-row">
+          <span class="inv-label">订单状态</span>
+          <span id="detail-status">-</span>
+        </div>
+        <div class="invoice-row">
+          <span class="inv-label">发票状态</span>
+          <span class="inv-value" style="color:var(--text-muted);">未开具</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="showToast('电子发票已发送至注册邮箱', 'success');closeModal('modal-order-detail');">申请电子发票</button>
+        <button class="btn btn-ghost" onclick="closeModal('modal-order-detail')">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/sidebar.js"></script>
+  <script>
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + (type || 'info');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      toast.innerHTML = '<span>' + (icons[type]||'ℹ️') + '</span><span>' + message + '</span>';
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+
+    function selectPlan(el) {
+      document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function confirmUpgrade() {
+      const card = document.querySelector('.plan-card.selected');
+      const planName = card ? card.querySelector('.plan-name').textContent : '新套餐';
+      closeModal('modal-upgrade-plan');
+      showToast('已提交升级至「' + planName + '」的申请，即将生效', 'success');
+    }
+
+    function openOrderDetail(orderId, service, content, amount, time, status) {
+      document.getElementById('detail-order-id').textContent = orderId;
+      document.getElementById('detail-service').textContent = service;
+      document.getElementById('detail-content').textContent = content;
+      document.getElementById('detail-amount').textContent = amount;
+      document.getElementById('detail-time').textContent = time;
+      const statusEl = document.getElementById('detail-status');
+      const statusMap = { paid: '<span class="bill-status paid">● 已支付</span>', pending: '<span class="bill-status pending">● 待支付</span>', cancelled: '<span class="bill-status cancelled">● 已取消</span>' };
+      statusEl.innerHTML = statusMap[status] || status;
+      openModal('modal-order-detail');
+    }
+  </script>
 </body>
 </html>

@@ -269,5 +269,53 @@
   </div>
 
   <script src="../js/sidebar.js"></script>
+  <script>
+    document.querySelectorAll('.message-item').forEach(item => {
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', function() {
+        const title = this.querySelector('.msg-title').textContent;
+        const body = this.querySelector('.msg-body').textContent;
+        const tag = this.querySelector('.msg-tag') ? this.querySelector('.msg-tag').textContent : '';
+        const time = this.querySelector('.msg-time').textContent;
+        document.getElementById('announce-title').textContent = title;
+        document.getElementById('announce-body').textContent = body;
+        document.getElementById('announce-tag').textContent = tag;
+        document.getElementById('announce-time').textContent = time;
+        openModal('modal-announce');
+      });
+    });
+    document.querySelector('.mark-all-btn').addEventListener('click', function() {
+      document.querySelectorAll('.msg-dot').forEach(d => d.classList.add('read'));
+      document.querySelectorAll('.msg-title').forEach(t => t.classList.add('read'));
+      showToast('所有消息已标记为已读', 'success');
+    });
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+    function showToast(m, t) {
+      const c = document.getElementById('toast-container'), d = document.createElement('div');
+      d.className = 'toast ' + (t||'info');
+      d.innerHTML = '<span>' + ({success:'✅',error:'❌',info:'ℹ️'}[t]||'ℹ️') + '</span><span>' + m + '</span>';
+      c.appendChild(d);
+      setTimeout(() => { d.style.opacity = '0'; d.style.transform = 'translateX(20px)'; setTimeout(() => d.remove(), 300); }, 2500);
+    }
+  </script>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="modal-overlay" id="modal-announce" style="display:none;">
+    <div class="modal" style="min-width:500px;max-width:600px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="announce-title" style="text-align:left;">-</h3>
+        <button class="modal-close" onclick="closeModal('modal-announce')">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <span style="font-size:12px;color:var(--text-muted);" id="announce-time">-</span>
+        <span style="font-size:11px;padding:2px 8px;border-radius:var(--radius-sm);background:rgba(139,92,246,0.1);color:var(--accent-purple-light);" id="announce-tag">-</span>
+      </div>
+      <div style="font-size:14px;color:var(--text-secondary);line-height:1.8;white-space:pre-wrap;" id="announce-body">-</div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-announce')">关闭</button></div>
+    </div>
+  </div>
 </body>
 </html>

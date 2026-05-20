@@ -19,9 +19,7 @@
       padding: 20px; height: 180px; margin-top: 16px;
       display: flex; align-items: flex-end; justify-content: space-between; position: relative;
     }
-    .storage-page .chart-line {
-      position: absolute; bottom: 40px; left: 40px; right: 40px; top: 40px;
-    }
+    .storage-page .chart-line { position: absolute; bottom: 40px; left: 40px; right: 40px; top: 40px; }
     .storage-page .chart-svg { width: 100%; height: 100%; }
     .storage-page .balance-bar {
       background: var(--bg-card); border: 1px solid var(--border-secondary); border-radius: var(--radius-lg);
@@ -32,6 +30,66 @@
     .storage-page .balance-value { font-size: 28px; color: var(--accent-purple-light); font-weight: 600; }
     .storage-page .balance-side { text-align: right; }
     .storage-page .balance-side-item { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+
+    /* Recharge options in modal */
+    .recharge-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .recharge-option {
+      padding: 14px 10px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-md);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .recharge-option:hover { border-color: var(--accent-purple); background: rgba(139,92,246,0.05); }
+    .recharge-option.selected { border-color: var(--accent-purple); background: rgba(139,92,246,0.08); color: var(--accent-purple-light); font-weight: 600; }
+    .recharge-option .r-price { font-size: 20px; font-weight: 700; }
+    .recharge-option .r-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Purchase spec grid */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .spec-card {
+      padding: 14px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-md);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .spec-card:hover { border-color: var(--accent-purple); background: rgba(139,92,246,0.05); }
+    .spec-card.selected { border-color: var(--accent-purple); background: rgba(139,92,246,0.08); }
+    .spec-card .spec-size { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+    .spec-card .spec-price { font-size: 13px; color: var(--accent-purple-light); margin-top: 4px; }
+    .spec-card .spec-label { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    .total-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .total-row .total-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent-purple-light);
+    }
   </style>
 </head>
 <body data-page="console-storage">
@@ -47,38 +105,22 @@
       <main class="content-area storage-page">
         <div class="page-title">数据管理</div>
 
-        <!-- 标准存储 -->
         <div class="section">
           <div class="section-header">
             <div class="section-title">标准存储</div>
-            <button class="btn btn-sm btn-primary">立即购买</button>
+            <button class="btn btn-sm btn-primary" onclick="openBuyModal('存储')">立即购买</button>
           </div>
           <div class="stats-row">
-            <div class="stat-box">
-              <div class="stat-label">存储容量统计</div>
-              <div class="stat-value">539.1 M/100G</div>
-              <div class="stat-sub">到期时间:2027年5月20日</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">七日上传量统计</div>
-              <div class="stat-value">539.1 M</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">读取次数</div>
-              <div class="stat-value">3767</div>
-            </div>
+            <div class="stat-box"><div class="stat-label">存储容量统计</div><div class="stat-value">539.1 M/100G</div><div class="stat-sub">到期时间:2027年5月20日</div></div>
+            <div class="stat-box"><div class="stat-label">七日上传量统计</div><div class="stat-value">539.1 M</div></div>
+            <div class="stat-box"><div class="stat-label">读取次数</div><div class="stat-value">3767</div></div>
           </div>
           <div class="stat-label" style="margin-bottom:8px;">存储趋势统计</div>
           <div class="chart-area">
             <svg class="chart-svg" viewBox="0 0 400 120" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
-                  <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0" />
-                </linearGradient>
-              </defs>
-              <path d="M0,80 Q30,60 60,70 T120,50 T180,65 T240,40 T300,55 T360,35 T400,45 L400,120 L0,120 Z" fill="url(#grad1)" />
-              <path d="M0,80 Q30,60 60,70 T120,50 T180,65 T240,40 T300,55 T360,35 T400,45" fill="none" stroke="#8b5cf6" stroke-width="2" />
+              <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.3"/><stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0"/></linearGradient></defs>
+              <path d="M0,80 Q30,60 60,70 T120,50 T180,65 T240,40 T300,55 T360,35 T400,45 L400,120 L0,120 Z" fill="url(#grad1)"/>
+              <path d="M0,80 Q30,60 60,70 T120,50 T180,65 T240,40 T300,55 T360,35 T400,45" fill="none" stroke="#8b5cf6" stroke-width="2"/>
             </svg>
             <div style="position:absolute;bottom:8px;left:16px;font-size:11px;color:var(--text-muted);">¥0</div>
             <div style="position:absolute;bottom:8px;right:16px;font-size:11px;color:var(--text-muted);">10-31</div>
@@ -88,38 +130,22 @@
 
         <div class="divider"></div>
 
-        <!-- 数据取回 -->
         <div class="section">
           <div class="section-header">
             <div class="section-title">数据取回</div>
-            <button class="btn btn-sm btn-primary">立即购买</button>
+            <button class="btn btn-sm btn-primary" onclick="openBuyModal('取回')">立即购买</button>
           </div>
           <div class="stats-row">
-            <div class="stat-box">
-              <div class="stat-label">取回容量统计</div>
-              <div class="stat-value">239.1 M/100G</div>
-              <div class="stat-sub">到期时间:2027年5月20日</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">七日取回量统计</div>
-              <div class="stat-value">44.8 M</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">读取次数</div>
-              <div class="stat-value">2213</div>
-            </div>
+            <div class="stat-box"><div class="stat-label">取回容量统计</div><div class="stat-value">239.1 M/100G</div><div class="stat-sub">到期时间:2027年5月20日</div></div>
+            <div class="stat-box"><div class="stat-label">七日取回量统计</div><div class="stat-value">44.8 M</div></div>
+            <div class="stat-box"><div class="stat-label">读取次数</div><div class="stat-value">2213</div></div>
           </div>
           <div class="stat-label" style="margin-bottom:8px;">存储趋势统计</div>
           <div class="chart-area">
             <svg class="chart-svg" viewBox="0 0 400 120" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.3" />
-                  <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0" />
-                </linearGradient>
-              </defs>
-              <path d="M0,90 Q40,70 80,75 T160,55 T240,60 T320,45 T400,50 L400,120 L0,120 Z" fill="url(#grad2)" />
-              <path d="M0,90 Q40,70 80,75 T160,55 T240,60 T320,45 T400,50" fill="none" stroke="#a78bfa" stroke-width="2" />
+              <defs><linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.3"/><stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0"/></linearGradient></defs>
+              <path d="M0,90 Q40,70 80,75 T160,55 T240,60 T320,45 T400,50 L400,120 L0,120 Z" fill="url(#grad2)"/>
+              <path d="M0,90 Q40,70 80,75 T160,55 T240,60 T320,45 T400,50" fill="none" stroke="#a78bfa" stroke-width="2"/>
             </svg>
             <div style="position:absolute;bottom:8px;left:16px;font-size:11px;color:var(--text-muted);">0 MB</div>
             <div style="position:absolute;bottom:8px;right:16px;font-size:11px;color:var(--text-muted);">10-31</div>
@@ -129,104 +155,232 @@
 
         <div class="divider"></div>
 
-        <!-- 存证管理 -->
         <div class="section">
           <div class="section-header">
             <div class="section-title">存证管理</div>
-            <button class="btn btn-sm btn-primary">立即充值</button>
+            <button class="btn btn-sm btn-primary" onclick="openRechargeModal()">立即充值</button>
           </div>
           <div class="balance-bar">
-            <div class="balance-info">
-              <div class="balance-label">当前账户余额</div>
-              <div class="balance-value">¥ 2,000.00</div>
-            </div>
-            <div class="balance-side">
-              <div class="balance-side-item">本月已消费：¥159.88</div>
-              <div class="balance-side-item">累计已消费：¥159.88</div>
-            </div>
+            <div class="balance-info"><div class="balance-label">当前账户余额</div><div class="balance-value">¥ 2,000.00</div></div>
+            <div class="balance-side"><div class="balance-side-item">本月已消费：¥159.88</div><div class="balance-side-item">累计已消费：¥159.88</div></div>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <!-- 数据存证 -->
         <div class="section">
-          <div class="section-header">
-            <div class="section-title">数据存证</div>
-          </div>
+          <div class="section-header"><div class="section-title">数据存证</div></div>
           <div class="stats-row">
-            <div class="stat-box">
-              <div class="stat-label">存证条数统计</div>
-              <div class="stat-value">12.6M</div>
-              <div class="stat-sub">单价:0.03元/条</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">七日存证量统计</div>
-              <div class="stat-value">0.8 M</div>
-              <div class="stat-sub">本月消费:¥200.00</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">出证次数</div>
-              <div class="stat-value">210</div>
-              <div class="stat-sub">免费</div>
-            </div>
+            <div class="stat-box"><div class="stat-label">存证条数统计</div><div class="stat-value">12.6M</div><div class="stat-sub">单价:0.03元/条</div></div>
+            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value">0.8 M</div><div class="stat-sub">本月消费:¥200.00</div></div>
+            <div class="stat-box"><div class="stat-label">出证次数</div><div class="stat-value">210</div><div class="stat-sub">免费</div></div>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <!-- 实时出证 -->
         <div class="section">
-          <div class="section-header">
-            <div class="section-title">实时出证</div>
-          </div>
+          <div class="section-header"><div class="section-title">实时出证</div></div>
           <div class="stats-row">
-            <div class="stat-box">
-              <div class="stat-label">累计出证份数</div>
-              <div class="stat-value">895 份</div>
-              <div class="stat-sub">单价:2元/份</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">七日存证量统计</div>
-              <div class="stat-value">57 份</div>
-              <div class="stat-sub">本月消费:¥200.00</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">下载次数</div>
-              <div class="stat-value">210</div>
-              <div class="stat-sub">免费</div>
-            </div>
+            <div class="stat-box"><div class="stat-label">累计出证份数</div><div class="stat-value">895 份</div><div class="stat-sub">单价:2元/份</div></div>
+            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value">57 份</div><div class="stat-sub">本月消费:¥200.00</div></div>
+            <div class="stat-box"><div class="stat-label">下载次数</div><div class="stat-value">210</div><div class="stat-sub">免费</div></div>
           </div>
         </div>
 
         <div class="divider"></div>
 
-        <!-- 正式公证书 -->
         <div class="section">
-          <div class="section-header">
-            <div class="section-title">正式公证书</div>
-          </div>
+          <div class="section-header"><div class="section-title">正式公证书</div></div>
           <div class="stats-row">
-            <div class="stat-box">
-              <div class="stat-label">累计公证书份数</div>
-              <div class="stat-value">14 份</div>
-              <div class="stat-sub">单价:1200元/份</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">七日存证量统计</div>
-              <div class="stat-value">0 份</div>
-              <div class="stat-sub">本月消费:¥00.00</div>
-            </div>
-            <div class="stat-box">
-              <div class="stat-label">核验次数</div>
-              <div class="stat-value">32</div>
-              <div class="stat-sub">免费</div>
-            </div>
+            <div class="stat-box"><div class="stat-label">累计公证书份数</div><div class="stat-value">14 份</div><div class="stat-sub">单价:1200元/份</div></div>
+            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value">0 份</div><div class="stat-sub">本月消费:¥00.00</div></div>
+            <div class="stat-box"><div class="stat-label">核验次数</div><div class="stat-value">32</div><div class="stat-sub">免费</div></div>
           </div>
         </div>
       </main>
     </div>
   </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- 购买弹窗 -->
+  <div class="modal-overlay" id="modal-buy" style="display:none;">
+    <div class="modal" style="min-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="buy-modal-title">购买存储服务</h3>
+        <button class="modal-close" onclick="closeModal('modal-buy')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">选择规格</label>
+          <div class="spec-grid" id="spec-grid">
+            <div class="spec-card selected" onclick="selectSpec(this)" data-spec="50GB" data-price="49">
+              <div class="spec-size">50 GB</div>
+              <div class="spec-price">¥ 49</div>
+              <div class="spec-label">/月</div>
+            </div>
+            <div class="spec-card" onclick="selectSpec(this)" data-spec="100GB" data-price="99">
+              <div class="spec-size">100 GB</div>
+              <div class="spec-price">¥ 99</div>
+              <div class="spec-label">/月</div>
+            </div>
+            <div class="spec-card" onclick="selectSpec(this)" data-spec="500GB" data-price="399">
+              <div class="spec-size">500 GB</div>
+              <div class="spec-price">¥ 399</div>
+              <div class="spec-label">/月</div>
+            </div>
+            <div class="spec-card" onclick="selectSpec(this)" data-spec="1TB" data-price="699">
+              <div class="spec-size">1 TB</div>
+              <div class="spec-price">¥ 699</div>
+              <div class="spec-label">/月</div>
+            </div>
+            <div class="spec-card" onclick="selectSpec(this)" data-spec="5TB" data-price="2999">
+              <div class="spec-size">5 TB</div>
+              <div class="spec-price">¥ 2,999</div>
+              <div class="spec-label">/月</div>
+            </div>
+            <div class="spec-card" onclick="selectSpec(this)" data-spec="10TB" data-price="5499">
+              <div class="spec-size">10 TB</div>
+              <div class="spec-price">¥ 5,499</div>
+              <div class="spec-label">/月</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">购买时长</label>
+          <div class="spec-grid" id="duration-grid" style="grid-template-columns:repeat(4,1fr);">
+            <div class="spec-card selected" onclick="selectDuration(this)" data-months="1" data-discount="1"><div class="spec-size">1个月</div></div>
+            <div class="spec-card" onclick="selectDuration(this)" data-months="3" data-discount="0.9"><div class="spec-size">3个月</div><div class="spec-label">9折</div></div>
+            <div class="spec-card" onclick="selectDuration(this)" data-months="6" data-discount="0.85"><div class="spec-size">6个月</div><div class="spec-label">85折</div></div>
+            <div class="spec-card" onclick="selectDuration(this)" data-months="12" data-discount="0.75"><div class="spec-size">1年</div><div class="spec-label">75折</div></div>
+          </div>
+        </div>
+        <div class="total-row">合计：<span class="total-price" id="buy-total">¥ 49.00</span></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-buy')">取消</button>
+        <button class="btn btn-primary" onclick="confirmBuy()">确认购买</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 充值弹窗 -->
+  <div class="modal-overlay" id="modal-recharge" style="display:none;">
+    <div class="modal" style="min-width:440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">账户充值</h3>
+        <button class="modal-close" onclick="closeModal('modal-recharge')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">当前余额：<span style="color:var(--accent-purple-light);font-weight:600;">¥ 2,000.00</span></label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">选择充值金额</label>
+          <div class="recharge-options">
+            <div class="recharge-option" onclick="selectRecharge(this, 100)"><div class="r-price">¥ 100</div></div>
+            <div class="recharge-option" onclick="selectRecharge(this, 200)"><div class="r-price">¥ 200</div></div>
+            <div class="recharge-option selected" onclick="selectRecharge(this, 500)"><div class="r-price">¥ 500</div><div class="r-desc">赠送 ¥50</div></div>
+            <div class="recharge-option" onclick="selectRecharge(this, 1000)"><div class="r-price">¥ 1,000</div><div class="r-desc">赠送 ¥150</div></div>
+            <div class="recharge-option" onclick="selectRecharge(this, 2000)"><div class="r-price">¥ 2,000</div><div class="r-desc">赠送 ¥400</div></div>
+            <div class="recharge-option" onclick="selectRecharge(this, 5000)"><div class="r-price">¥ 5,000</div><div class="r-desc">赠送 ¥1200</div></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">或输入自定义金额</label>
+          <input class="form-input" id="recharge-custom" placeholder="自定义金额（最低 ¥10）" type="number" min="10" oninput="selectCustomRecharge()">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-recharge')">取消</button>
+        <button class="btn btn-primary" onclick="confirmRecharge()">确认充值</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/sidebar.js"></script>
+  <script>
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + (type || 'info');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      toast.innerHTML = '<span>' + (icons[type]||'ℹ️') + '</span><span>' + message + '</span>';
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+
+    // ========= BUY MODAL =========
+    let selectedPrice = 49, selectedMonths = 1, selectedDiscount = 1;
+    function openBuyModal(type) {
+      document.getElementById('buy-modal-title').textContent = '购买' + type + '服务';
+      resetSpecs();
+      updateBuyTotal();
+      openModal('modal-buy');
+    }
+    function selectSpec(el) {
+      document.querySelectorAll('#spec-grid .spec-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedPrice = parseInt(el.dataset.price);
+      updateBuyTotal();
+    }
+    function selectDuration(el) {
+      document.querySelectorAll('#duration-grid .spec-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedMonths = parseInt(el.dataset.months);
+      selectedDiscount = parseFloat(el.dataset.discount);
+      updateBuyTotal();
+    }
+    function resetSpecs() {
+      document.querySelector('#spec-grid .spec-card').classList.add('selected');
+      document.querySelectorAll('#spec-grid .spec-card:not(:first-child)').forEach(c => c.classList.remove('selected'));
+      document.querySelector('#duration-grid .spec-card').classList.add('selected');
+      document.querySelectorAll('#duration-grid .spec-card:not(:first-child)').forEach(c => c.classList.remove('selected'));
+      selectedPrice = 49; selectedMonths = 1; selectedDiscount = 1;
+      updateBuyTotal();
+    }
+    function updateBuyTotal() {
+      const total = selectedPrice * selectedMonths * selectedDiscount;
+      document.getElementById('buy-total').textContent = '¥ ' + total.toFixed(2);
+    }
+    function confirmBuy() {
+      const total = (selectedPrice * selectedMonths * selectedDiscount).toFixed(2);
+      closeModal('modal-buy');
+      showToast('购买成功！已支付 ¥' + total + '，服务已开通', 'success');
+    }
+
+    // ========= RECHARGE MODAL =========
+    let rechargeAmount = 500;
+    function selectRecharge(el, amount) {
+      document.querySelectorAll('.recharge-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      rechargeAmount = amount;
+      document.getElementById('recharge-custom').value = '';
+    }
+    function selectCustomRecharge() {
+      const val = parseInt(document.getElementById('recharge-custom').value) || 0;
+      if (val >= 10) {
+        document.querySelectorAll('.recharge-option').forEach(o => o.classList.remove('selected'));
+        rechargeAmount = val;
+      }
+    }
+    function openRechargeModal() {
+      document.querySelectorAll('.recharge-option').forEach(o => o.classList.remove('selected'));
+      document.querySelector('.recharge-option:nth-child(3)').classList.add('selected');
+      document.getElementById('recharge-custom').value = '';
+      rechargeAmount = 500;
+      openModal('modal-recharge');
+    }
+    function confirmRecharge() {
+      if (rechargeAmount < 10) { showToast('充值金额不能低于 ¥10', 'error'); return; }
+      closeModal('modal-recharge');
+      showToast('充值成功！已到账 ¥' + rechargeAmount.toFixed(2), 'success');
+    }
+  </script>
 </body>
 </html>

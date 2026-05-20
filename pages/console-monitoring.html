@@ -382,13 +382,67 @@
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Option buttons
     document.querySelectorAll('.option-btn').forEach(btn => {
       btn.addEventListener('click', function() {
+        if (this.textContent.trim() === '自定义') { openModal('modal-qps'); return; }
         this.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
         this.classList.add('active');
       });
     });
+    // Click log row to see detail
+    document.querySelectorAll('.log-table tbody tr').forEach(row => {
+      row.style.cursor = 'pointer';
+      row.addEventListener('click', function() {
+        const cells = this.querySelectorAll('td');
+        const detail = Array.from(cells).map(c => c.textContent.trim()).join(' | ');
+        document.getElementById('log-detail-content').textContent = detail;
+        openModal('modal-log-detail');
+      });
+    });
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+    function confirmQPS() {
+      const v = parseInt(document.getElementById('qps-input').value);
+      if (!v||v<1) { document.getElementById('qps-error').classList.add('show'); return; }
+      closeModal('modal-qps');
+      showToast('QPS 限制已更新为 ' + v, 'success');
+    }
+    function showToast(m, t) {
+      const c = document.getElementById('toast-container'), d = document.createElement('div');
+      d.className = 'toast ' + (t||'info');
+      d.innerHTML = '<span>' + ({success:'✅',error:'❌',info:'ℹ️'}[t]||'ℹ️') + '</span><span>' + m + '</span>';
+      c.appendChild(d);
+      setTimeout(() => { d.style.opacity = '0'; d.style.transform = 'translateX(20px)'; setTimeout(() => d.remove(), 300); }, 2500);
+    }
   </script>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <div class="modal-overlay" id="modal-qps" style="display:none;">
+    <div class="modal" style="min-width:380px;">
+      <div class="modal-header"><h3 class="modal-title">自定义 QPS 限制</h3><button class="modal-close" onclick="closeModal('modal-qps')">✕</button></div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">请输入 QPS 上限值</label>
+          <input class="form-input" id="qps-input" type="number" min="1" placeholder="例如：8000">
+          <div class="form-error" id="qps-error">请输入有效数值（最低 1）</div>
+        </div>
+        <div class="form-hint">设置后将立即生效，超出限制的请求将被限流。</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-qps')">取消</button>
+        <button class="btn btn-primary" onclick="confirmQPS()">确认设置</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-log-detail" style="display:none;">
+    <div class="modal" style="min-width:480px;">
+      <div class="modal-header"><h3 class="modal-title">日志详情</h3><button class="modal-close" onclick="closeModal('modal-log-detail')">✕</button></div>
+      <div class="modal-body-text" id="log-detail-content" style="font-family:monospace;font-size:12px;background:var(--bg-secondary);padding:16px;border-radius:var(--radius-md);word-break:break-all;"></div>
+      <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('modal-log-detail')">关闭</button></div>
+    </div>
+  </div>
 </body>
 </html>
