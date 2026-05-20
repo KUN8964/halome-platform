@@ -101,8 +101,6 @@
     }
     .chart-box-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
 
-    .modal.show { display: flex; }
-    .modal { display: none; }
     .form-group-inline { display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 16px; margin-bottom: 20px; }
     .form-group-inline .form-label { margin-bottom: 0; text-align: right; color: var(--text-link); }
     .upload-box {
@@ -129,16 +127,7 @@
     .timer-text { font-size: 12px; color: var(--text-muted); text-align: center; margin: 8px 0; }
     .timer-text span { color: var(--text-link); cursor: pointer; }
 
-    .modal-footer-btn { display: flex; justify-content: center; margin-top: 24px; }
     .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .sn-input {
-      width: 100%; padding: 12px 16px; font-size: 14px; font-family: monospace;
-      border: 1px solid var(--border-input); border-radius: var(--radius-md);
-      background: var(--bg-input); color: var(--accent-purple-light); outline: none;
-      margin: 16px 0;
-    }
   </style>
 </head>
 <body data-page="console-dashboard">
@@ -350,32 +339,33 @@
   </div>
 
   <!-- 兑换抵扣券 Modal -->
-  <div class="modal-overlay modal" id="modal-exchange">
+  <div class="modal-overlay" id="modal-exchange" style="display:none;">
     <div class="modal" style="min-width:420px;">
       <div class="modal-header">
-        <div></div>
-        <div class="modal-title">兑换抵扣券</div>
+        <h3 class="modal-title">兑换抵扣券</h3>
         <button class="modal-close" onclick="closeModal('modal-exchange')">✕</button>
       </div>
-      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+      <div class="modal-body-text" style="text-align:center;">
         请将机器 SN码 输入下方对话框中。
       </div>
-      <input type="text" class="sn-input" value="sn-7e3c0Fce9d8c049b587557677eb105b85">
-      <div class="modal-footer-btn">
-        <button class="btn btn-primary">兑换</button>
+      <div class="form-group">
+        <input type="text" class="form-input" value="sn-7e3c0Fce9d8c049b587557677eb105b85" style="font-family:monospace;color:var(--accent-purple-light);">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-exchange')">取消</button>
+        <button class="btn btn-primary" onclick="confirmExchange()">兑换</button>
       </div>
     </div>
   </div>
 
   <!-- API Key 安全验证 Modal -->
-  <div class="modal-overlay modal" id="modal-apikey-verify">
+  <div class="modal-overlay" id="modal-apikey-verify" style="display:none;">
     <div class="modal" style="min-width:440px;">
       <div class="modal-header">
-        <div></div>
-        <div class="modal-title">查看API Key</div>
+        <h3 class="modal-title">查看API Key</h3>
         <button class="modal-close" onclick="closeModal('modal-apikey-verify')">✕</button>
       </div>
-      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:20px;line-height:1.6;">
+      <div class="modal-body-text" style="text-align:center;">
         查看API Key需要进行安全验证，验证码已发送到<br>137 0000 1234 手机号中
       </div>
       <div class="code-inputs">
@@ -387,41 +377,39 @@
         <input type="text" maxlength="1">
       </div>
       <div class="timer-text">59s后重新发送 <span>重新发送</span></div>
-      <div class="modal-footer-btn">
+      <div class="modal-actions">
         <button class="btn btn-primary" onclick="closeModal('modal-apikey-verify');showModal('modal-apikey-show')">验证</button>
       </div>
     </div>
   </div>
 
   <!-- API Key 展示 Modal -->
-  <div class="modal-overlay modal" id="modal-apikey-show">
+  <div class="modal-overlay" id="modal-apikey-show" style="display:none;">
     <div class="modal" style="min-width:420px;">
       <div class="modal-header">
-        <div></div>
-        <div class="modal-title">创建云空间</div>
+        <h3 class="modal-title">API Key</h3>
         <button class="modal-close" onclick="closeModal('modal-apikey-show')">✕</button>
       </div>
-      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+      <div class="modal-body-text" style="text-align:center;">
         请将此 API key 保存在安全且易于手动输入的地方。
       </div>
       <div class="apikey-box">sk-7e3c0Fce9d8c049b587557677eb105b85</div>
-      <div class="modal-footer-btn">
-        <button class="btn btn-primary">复制</button>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="copyApiKey();closeModal('modal-apikey-show')">复制</button>
       </div>
     </div>
   </div>
 
   <!-- 机构认证 Modal -->
-  <div class="modal-overlay modal" id="modal-auth-org">
+  <div class="modal-overlay" id="modal-auth-org" style="display:none;">
     <div class="modal" style="min-width:520px;">
       <div class="modal-header">
-        <div></div>
-        <div class="modal-title">企业认证</div>
+        <h3 class="modal-title">企业认证</h3>
         <button class="modal-close" onclick="closeModal('modal-auth-org')">✕</button>
       </div>
       <div style="text-align:center;margin-bottom:24px;">
         <button class="option-btn active" style="margin-right:8px;">机构</button>
-        <button class="option-btn">机构</button>
+        <button class="option-btn">企业</button>
       </div>
       <div class="form-group-inline">
         <div class="form-label">机构名称</div>
@@ -442,18 +430,17 @@
           <div>请上传大小不超过5M的图片，支持.jpg.jpeg.pdf.gif.png格式</div>
         </div>
       </div>
-      <div class="modal-footer-btn">
+      <div class="modal-actions">
         <button class="btn btn-primary">提交</button>
       </div>
     </div>
   </div>
 
   <!-- 企业认证 Modal -->
-  <div class="modal-overlay modal" id="modal-auth-enterprise">
+  <div class="modal-overlay" id="modal-auth-enterprise" style="display:none;">
     <div class="modal" style="min-width:520px;">
       <div class="modal-header">
-        <div></div>
-        <div class="modal-title">企业认证</div>
+        <h3 class="modal-title">企业认证</h3>
         <button class="modal-close" onclick="closeModal('modal-auth-enterprise')">✕</button>
       </div>
       <div style="text-align:center;margin-bottom:24px;">
@@ -479,26 +466,32 @@
           <div>请上传大小不超过5M的图片，支持.jpg.jpeg.pdf.gif.png格式</div>
         </div>
       </div>
-      <div class="modal-footer-btn">
+      <div class="modal-actions">
         <button class="btn btn-primary">提交</button>
       </div>
     </div>
   </div>
 
   <!-- 创建云空间 Modal -->
-  <div class="modal-overlay modal" id="modal-create-space">
+  <div class="modal-overlay" id="modal-create-space" style="display:none;">
     <div class="modal" style="min-width:420px;">
       <div class="modal-header">
-        <div></div>
-        <div class="modal-title">创建云空间</div>
+        <h3 class="modal-title">创建云空间</h3>
         <button class="modal-close" onclick="closeModal('modal-create-space')">✕</button>
       </div>
-      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px;">
-        请将此 API key 保存在安全且易于手动输入的地方。
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">空间名称</label>
+          <input class="form-input" placeholder="请输入空间名称">
+        </div>
+        <div class="form-group">
+          <label class="form-label">空间描述</label>
+          <input class="form-input" placeholder="请输入空间描述（选填）">
+        </div>
       </div>
-      <div class="apikey-box">sk-7e3c0Fce9d8c049b587557677eb105b85</div>
-      <div class="modal-footer-btn">
-        <button class="btn btn-primary">复制</button>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-create-space')">取消</button>
+        <button class="btn btn-primary" onclick="confirmCreateSpace()">创建</button>
       </div>
     </div>
   </div>
@@ -516,15 +509,31 @@
       });
     });
 
-    function showModal(id) { document.getElementById(id).classList.add('show'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
     // Close modal on overlay click
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', function(e) {
-        if (e.target === this) this.classList.remove('show');
-      });
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none';
     });
+
+    // 兑换抵扣券
+    function confirmExchange() {
+      closeModal('modal-exchange');
+      alert('✅ 抵扣券兑换成功！');
+    }
+
+    // 复制 API Key
+    function copyApiKey() {
+      const el = document.querySelector('#modal-apikey-show .apikey-box');
+      if (el) { navigator.clipboard.writeText(el.textContent).then(() => {}).catch(() => {}); }
+    }
+
+    // 创建云空间
+    function confirmCreateSpace() {
+      closeModal('modal-create-space');
+      alert('✅ 云空间创建成功！');
+    }
 
     // Code input auto-focus
     document.querySelectorAll('.code-inputs input').forEach((input, index, inputs) => {
