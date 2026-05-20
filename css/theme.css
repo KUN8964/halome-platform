@@ -255,6 +255,35 @@ a.nav-item {
   opacity: 0.5;
 }
 
+.sidebar-user {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-secondary);
+}
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.sidebar-user-avatar {
+  font-size: 16px;
+}
+.sidebar-user-phone {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.sidebar-logout {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--text-link);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+.sidebar-logout:hover {
+  color: var(--accent-red);
+}
+
 .sidebar-footer {
   padding: 16px 20px;
   border-top: 1px solid var(--border-secondary);

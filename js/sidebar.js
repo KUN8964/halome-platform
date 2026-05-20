@@ -85,6 +85,26 @@
   });
 
   html += `</nav>`;
+
+  // 用户信息区（读取 localStorage 会话）
+  var userHtml = '';
+  try {
+    var session = JSON.parse(localStorage.getItem('halome_session') || 'null');
+    if (session && session.phone) {
+      var masked = session.phone.substring(0, 3) + '****' + session.phone.substring(session.phone.length - 4);
+      userHtml = `
+        <div class="sidebar-user">
+          <div class="sidebar-user-info">
+            <span class="sidebar-user-avatar">👤</span>
+            <span class="sidebar-user-phone">${masked}</span>
+          </div>
+          <a class="sidebar-logout" onclick="window.logout()">退出登录</a>
+        </div>
+      `;
+    }
+  } catch(e) {}
+  html += userHtml;
+
   html += `
     <div class="sidebar-footer">
       <div>服务状态 · 开放平台协议 · 隐私政策</div>
