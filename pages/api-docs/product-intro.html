@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>光宇云产品介绍 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../../css/theme.css">
+  <style>
+    .api-doc-page .page-header {
+      margin-bottom: 32px;
+    }
+    .api-doc-page .page-header h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .api-doc-page .page-header .breadcrumb {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .api-doc-page .page-header .breadcrumb a {
+      color: var(--text-link);
+      text-decoration: none;
+    }
+    .api-doc-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 28px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .api-doc-content h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-purple-light);
+      margin: 20px 0 8px;
+    }
+    .api-doc-content p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin: 0 0 12px;
+    }
+    .api-doc-content strong {
+      color: var(--text-primary);
+    }
+    .api-doc-content code {
+      background: var(--bg-input);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--accent-purple-light);
+    }
+    .api-doc-content pre {
+      background: var(--bg-input);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+    .api-doc-content pre code {
+      background: none;
+      padding: 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+    .api-doc-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .api-doc-content th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--bg-table-header);
+      color: var(--text-secondary);
+      font-weight: 500;
+      border-bottom: 1px solid var(--border-secondary);
+      font-size: 12px;
+    }
+    .api-doc-content td {
+      padding: 10px 14px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .api-doc-content tr:hover td {
+      background: rgba(139,92,246,0.04);
+    }
+    .api-doc-content ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+    .api-doc-content li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+    .api-doc-content hr {
+      border: none;
+      border-top: 1px solid var(--border-secondary);
+      margin: 24px 0;
+    }
+    .api-doc-content a {
+      color: var(--text-link);
+      text-decoration: none;
+    }
+    .api-doc-content a:hover {
+      text-decoration: underline;
+    }
+    .api-doc-content .endpoint {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      color: var(--accent-green);
+      margin: 4px 0;
+    }
+    .method-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .method-get { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+    .method-post { background: rgba(139,92,246,0.15); color: var(--accent-purple-light); }
+    .method-delete { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+  </style>
+</head>
+<body data-page="api-product-intro">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area api-doc-page">
+        <div class="page-header">
+          <div class="breadcrumb">
+            <a href="../../index.html">首页</a> &rsaquo; 资源中心 &rsaquo; API文档
+          </div>
+          <h2>光宇云产品介绍</h2>
+        </div>
+        <div class="card">
+          <div class="api-doc-content">
+            <p><strong>一、产品定位</strong></p><p>光宇云存储平台是一套面向企业、开发者及各类数据密集型业务的分布式云存储与数据服务体系。平台基于分布式架构与弹性资源调度，支持大规模横向扩展、多副本冗余存储、跨地域自动容灾，能够满足从对象存储、文件存储的多样化需求。</p><p>与传统中心化云存储相比，光宇云通过节点自治与协作机制，彻底消除了单点瓶颈与故障风险，实现更高的数据可靠性、更灵活的弹性扩展能力以及更低的总体拥有成本（TCO）。</p><p><strong>二、架构设计</strong></p><p>1. 去中心化架构：节点对等互联、弹性扩展、跨地域分布
+2. 多副本冗余与一致性机制：双副本标准、一致性协议、智能副本调度
+3. 数据访问与安全：统一接口、多层安全防护、安全防御能力</p><p><strong>三、核心能力</strong></p><p>对象存储、文件存储、CDN加速、跨协议兼容、应用支撑</p><p><strong>四、应用场景</strong></p><p>企业级备份与容灾、视频点播与直播、大数据与AI分析、互联网与移动应用、政企与金融场景</p><p><strong>五、优势</strong></p><p>高可靠（99.9999%）、高性能（PB级）、高安全、低成本、开放兼容</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../../js/sidebar.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script>checkAuth();</script>
+</body>
+</html>

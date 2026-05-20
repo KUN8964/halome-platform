@@ -19,11 +19,19 @@
       type: 'group',
       label: '资源中心',
       page: 'resource',
+      prefix: 'api-docs/',
       children: [
-        { label: 'API文档', page: 'api-docs' },
-        { label: 'SDK下载', page: 'sdk-download' },
-        { label: '代码示例', page: 'code-samples' },
-        { label: '在线测试', page: 'online-test' },
+        { label: '产品介绍', page: 'api-product-intro' },
+        { label: '说明', page: 'api-overview' },
+        { label: '获取token', page: 'api-get-token' },
+        { label: '小文件上传', page: 'api-upload-small' },
+        { label: '大文件上传', page: 'api-upload-large' },
+        { label: '文件下载', page: 'api-download' },
+        { label: '用户空间信息', page: 'api-user-storage' },
+        { label: '文件列表', page: 'api-file-list' },
+        { label: '删除文件', page: 'api-delete-file' },
+        { label: 'SDK集成', page: 'api-sdk' },
+        { label: '网关节点', page: 'api-gateway-nodes' },
       ]
     },
     {
@@ -44,13 +52,14 @@
   const sidebar = document.getElementById('sidebar');
   if (!sidebar) return;
 
-  // Auto-detect path level
+  // Auto-detect path level (supports 3 levels: root, pages/, pages/api-docs/)
+  const isInApiDocs = window.location.pathname.includes('/api-docs/');
   const isInPagesDir = window.location.pathname.includes('/pages/');
-  const linkPrefix = isInPagesDir ? '' : 'pages/';
+  const linkPrefix = isInApiDocs ? '../' : (isInPagesDir ? '' : 'pages/');
 
   let html = `
     <div class="sidebar-header">
-      <a href="${isInPagesDir ? '../index.html' : 'index.html'}" style="text-decoration:none;display:flex;align-items:center;gap:8px;">
+      <a href="${isInApiDocs ? '../../index.html' : (isInPagesDir ? '../index.html' : 'index.html')}" style="text-decoration:none;display:flex;align-items:center;gap:8px;">
         <div class="brand-logo">HALOME</div>
         <div style="color:var(--text-secondary);font-size:14px;">光宇</div>
         <div class="brand-badge">开放平台</div>
@@ -63,7 +72,7 @@
     if (item.type === 'item') {
       const isActive = currentPage === item.page;
       const href = item.page === 'price-calculator'
-        ? (isInPagesDir ? '../index.html' : 'index.html')
+        ? (isInApiDocs ? '../../index.html' : (isInPagesDir ? '../index.html' : 'index.html'))
         : linkPrefix + item.page + '.html';
       html += `<a href="${href}" class="nav-item ${isActive ? 'active' : ''}">${item.label}</a>`;
     } else if (item.type === 'group') {
@@ -78,7 +87,8 @@
       `;
       item.children.forEach(child => {
         const isActive = currentPage === child.page;
-        html += `<a href="${linkPrefix}${child.page}.html" class="nav-subitem ${isActive ? 'active' : ''}">${child.label}</a>`;
+        const childPrefix = item.prefix ? (isInApiDocs ? '' : item.prefix) : linkPrefix;
+        html += `<a href="${childPrefix}${child.page}.html" class="nav-subitem ${isActive ? 'active' : ''}">${child.label}</a>`;
       });
       html += `</div></div>`;
     }

@@ -17,6 +17,15 @@
     return phone.substring(0, 3) + '****' + phone.substring(phone.length - 4);
   }
 
+  // 计算相对于 login.html 的路径前缀
+  // 根目录: ./    pages/: ../    pages/api-docs/: ../../
+  function getBasePath() {
+    var p = window.location.pathname;
+    if (p.includes('/api-docs/')) return '../../';
+    if (p.includes('/pages/')) return '../';
+    return './';
+  }
+
   // ── 公开 API ──────────────────────
 
   window.getSession = function () {
@@ -81,19 +90,15 @@
 
   window.logout = function () {
     localStorage.removeItem(SESSION_KEY);
-    // 跳转到登录页（统一用 login.html）
-    var base = window.location.pathname.includes('/pages/') ? '../' : './';
-    window.location.href = base + 'login.html';
+    window.location.href = getBasePath() + 'login.html';
   };
 
   window.checkAuth = function () {
-    // 如果当前就是登录页，不需要检查
     if (window.location.pathname.endsWith('login.html')) {
       return;
     }
     if (!window.isLoggedIn()) {
-      var base = window.location.pathname.includes('/pages/') ? '../' : './';
-      window.location.href = base + 'login.html';
+      window.location.href = getBasePath() + 'login.html';
     }
   };
 
