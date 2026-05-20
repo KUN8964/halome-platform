@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>企业云盘 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .page-header .page-title { margin-bottom: 0; }
+
+    /* State toggle */
+    .state-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .state-toggle .toggle-label { font-size: 12px; color: var(--text-secondary); }
+
+    /* Usage grid */
+    .disk-usage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .disk-usage-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .disk-usage-item .usage-title { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+    .disk-usage-item .usage-value { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+    .disk-usage-item .usage-expire { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+    .disk-usage-item .progress-bar { margin-top: 8px; }
+
+    /* Org section */
+    .org-section { margin-bottom: 32px; }
+    .org-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .org-info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .org-info-card .card-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+    .org-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .org-detail-row:last-child { border-bottom: none; }
+    .org-detail-row .detail-label { font-size: 13px; color: var(--text-muted); }
+    .org-detail-row .detail-value { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+    .org-detail-row .detail-link { color: var(--text-link); font-size: 13px; cursor: pointer; }
+    .org-detail-row .detail-link:hover { text-decoration: underline; }
+
+    /* Org tree */
+    .org-tree-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .org-tree-card .card-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .tree-item .tree-icon { color: var(--text-muted); }
+    .tree-item .tree-expand { cursor: pointer; font-size: 10px; color: var(--text-muted); }
+    .tree-children { padding-left: 24px; }
+    .tree-item.root { font-weight: 600; color: var(--text-primary); font-size: 14px; }
+
+    /* Empty state (unauthenticated) */
+    .disk-empty-state {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 80px 40px;
+      text-align: center;
+    }
+    .disk-empty-state .empty-icon { font-size: 64px; margin-bottom: 20px; opacity: 0.4; }
+    .disk-empty-state .empty-title { font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; }
+    .disk-empty-state .empty-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+    /* State content toggle */
+    .state-content { display: none; }
+    .state-content.active { display: block; }
+  </style>
+</head>
+<body data-page="enterprise-disk">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area">
+        <div class="page-header">
+          <h1 class="page-title">企业云盘</h1>
+        </div>
+
+        <div class="state-toggle">
+          <span class="toggle-label">页面状态：</span>
+          <button class="option-btn" data-state="unauth" onclick="switchState('unauth')">未认证</button>
+          <button class="option-btn active" data-state="authed" onclick="switchState('authed')">已认证</button>
+        </div>
+
+        <!-- 未认证状态 -->
+        <div class="state-content" id="state-unauth">
+          <div class="disk-empty-state">
+            <div class="empty-icon">☁️</div>
+            <div class="empty-title">您还没有创建企业云盘</div>
+            <div class="empty-desc">
+              光宇云存储提供安全、高效、弹性的存储服务<br>
+              随时随地访问您的数据，支持多人协作
+            </div>
+            <button class="btn btn-primary btn-lg">立即认证</button>
+          </div>
+        </div>
+
+        <!-- 已认证状态 -->
+        <div class="state-content active" id="state-authed">
+          <!-- 用量情况 -->
+          <div class="disk-usage-grid">
+            <div class="disk-usage-item">
+              <div class="usage-title">存储使用情况</div>
+              <div class="usage-value">539.1 MB</div>
+              <div style="font-size:13px;color:var(--text-muted);">/ 100 GB</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:0.5%"></div></div>
+              <div class="usage-expire">有效期至 2025年12月31日</div>
+            </div>
+            <div class="disk-usage-item">
+              <div class="usage-title">取回统计</div>
+              <div class="usage-value">123.3 MB</div>
+              <div style="font-size:13px;color:var(--text-muted);">/ 100 GB</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:0.1%"></div></div>
+              <div class="usage-expire">有效期至 2025年12月31日</div>
+            </div>
+            <div class="disk-usage-item">
+              <div class="usage-title">Token输入量</div>
+              <div class="usage-value">456,780</div>
+              <div style="font-size:13px;color:var(--text-muted);">/ 1,000,000</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:45.6%;background:var(--accent-blue)"></div></div>
+              <div class="usage-expire">有效期至 2025年12月31日</div>
+            </div>
+            <div class="disk-usage-item">
+              <div class="usage-title">Token输出量</div>
+              <div class="usage-value">234,560</div>
+              <div style="font-size:13px;color:var(--text-muted);">/ 500,000</div>
+              <div class="progress-bar"><div class="progress-fill" style="width:46.9%;background:var(--accent-green)"></div></div>
+              <div class="usage-expire">有效期至 2025年12月31日</div>
+            </div>
+          </div>
+
+          <!-- 组织架构 -->
+          <div class="org-section">
+            <h2 class="section-title">组织架构</h2>
+            <div class="org-grid">
+              <div class="org-info-card">
+                <div class="card-title">企业信息</div>
+                <div class="org-detail-row">
+                  <span class="detail-label">企业代码</span>
+                  <span class="detail-value" style="font-family:monospace;">QSCG</span>
+                </div>
+                <div class="org-detail-row">
+                  <span class="detail-label">成员数量</span>
+                  <span class="detail-value">12 人</span>
+                </div>
+                <div class="org-detail-row">
+                  <span class="detail-label">组织管理</span>
+                  <span>
+                    <a class="detail-link">添加成员</a>
+                    <a class="detail-link" style="margin-left:12px;">成员管理</a>
+                    <a class="detail-link" style="margin-left:12px;">权限设置</a>
+                  </span>
+                </div>
+                <div class="org-detail-row">
+                  <span class="detail-label">云盘空间</span>
+                  <span>
+                    <a class="detail-link">扩容空间</a>
+                    <a class="detail-link" style="margin-left:12px;">关闭空间</a>
+                  </span>
+                </div>
+              </div>
+
+              <div class="org-tree-card">
+                <div class="card-title">组织架构</div>
+                <div class="tree-item root">
+                  <span class="tree-icon">🏢</span>
+                  <span>杭州七七八八久久有限公司</span>
+                </div>
+                <div class="tree-children">
+                  <div class="tree-item">
+                    <span class="tree-expand">▶</span>
+                    <span class="tree-icon">👥</span>
+                    <span>技术部</span>
+                    <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">5人</span>
+                  </div>
+                  <div class="tree-children">
+                    <div class="tree-item">
+                      <span class="tree-icon">👤</span>
+                      <span>张三</span>
+                    </div>
+                    <div class="tree-item">
+                      <span class="tree-icon">👤</span>
+                      <span>李四</span>
+                    </div>
+                    <div class="tree-item">
+                      <span class="tree-icon">👤</span>
+                      <span>王五</span>
+                    </div>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-expand">▶</span>
+                    <span class="tree-icon">👥</span>
+                    <span>运营部</span>
+                    <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">4人</span>
+                  </div>
+                  <div class="tree-item">
+                    <span class="tree-expand">▶</span>
+                    <span class="tree-icon">👥</span>
+                    <span>管理层</span>
+                    <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">3人</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    function switchState(state) {
+      document.querySelectorAll('.state-toggle .option-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.state-toggle .option-btn[data-state="${state}"]`).classList.add('active');
+      document.querySelectorAll('.state-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('state-' + state).classList.add('active');
+    }
+
+    // Tree expand/collapse
+    document.querySelectorAll('.tree-expand').forEach(el => {
+      el.addEventListener('click', function() {
+        const sibling = this.parentElement.nextElementSibling;
+        if (sibling && sibling.classList.contains('tree-children')) {
+          const isVisible = sibling.style.display !== 'none';
+          sibling.style.display = isVisible ? 'none' : 'block';
+          this.textContent = isVisible ? '▶' : '▼';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

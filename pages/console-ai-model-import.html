@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>导入模型 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .import-page { max-width: 720px; }
+    .import-page .page-title { margin-bottom: 8px; }
+    .page-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-link);
+      cursor: pointer;
+      margin-bottom: 24px;
+    }
+    .page-back:hover { color: var(--accent-purple-light); }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 32px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .step.active { color: var(--text-accent); }
+    .step.completed { color: var(--accent-green); }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border-primary);
+      color: var(--text-muted);
+    }
+    .step.active .step-num {
+      border-color: var(--accent-purple);
+      color: var(--accent-purple-light);
+      background: rgba(139, 92, 246, 0.1);
+    }
+    .step.completed .step-num {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    .step-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border-primary);
+      margin: 0 16px;
+    }
+    .step-line.completed { background: var(--accent-green); }
+
+    /* Step content */
+    .step-content { display: none; }
+    .step-content.active { display: block; }
+
+    /* Model type cards */
+    .model-type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .model-type-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .model-type-card:hover {
+      border-color: var(--text-muted);
+    }
+    .model-type-card.selected {
+      border-color: var(--accent-purple);
+      background: rgba(139, 92, 246, 0.05);
+    }
+    .model-type-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .model-type-name {
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .model-type-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Upload area */
+    .upload-area {
+      border: 2px dashed var(--border-primary);
+      border-radius: var(--radius-lg);
+      padding: 60px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-bottom: 24px;
+    }
+    .upload-area:hover { border-color: var(--accent-purple); }
+    .upload-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+    .upload-title { font-size: 15px; color: var(--text-secondary); margin-bottom: 8px; }
+    .upload-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+    .upload-formats { font-size: 12px; color: var(--text-tertiary); margin-top: 12px; }
+
+    /* Model info form */
+    .model-form {
+      max-width: 480px;
+    }
+    .model-form .form-group { margin-bottom: 20px; }
+
+    .step-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-secondary);
+    }
+  </style>
+</head>
+<body data-page="console-ai-model">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area">
+        <div class="import-page">
+          <h1 class="page-title">导入模型</h1>
+          <a class="page-back" onclick="location.href='console-ai-model.html'">← 返回模型管理</a>
+
+          <div class="steps">
+            <div class="step active" id="step-1">
+              <div class="step-num">1</div>
+              <span>选择模型类型</span>
+            </div>
+            <div class="step-line" id="line-1"></div>
+            <div class="step" id="step-2">
+              <div class="step-num">2</div>
+              <span>上传模型</span>
+            </div>
+            <div class="step-line" id="line-2"></div>
+            <div class="step" id="step-3">
+              <div class="step-num">3</div>
+              <span>完成</span>
+            </div>
+          </div>
+
+          <!-- Step 1: 选择模型类型 -->
+          <div class="step-content active" id="step-content-1">
+            <div class="model-type-grid">
+              <div class="model-type-card selected" onclick="selectType(this)">
+                <div class="model-type-icon">🧠</div>
+                <div class="model-type-name">ONNX</div>
+                <div class="model-type-desc">开放神经网络交换格式，支持跨框架模型</div>
+              </div>
+              <div class="model-type-card" onclick="selectType(this)">
+                <div class="model-type-icon">🔥</div>
+                <div class="model-type-name">PyTorch</div>
+                <div class="model-type-desc">Facebook 开源深度学习框架模型</div>
+              </div>
+              <div class="model-type-card" onclick="selectType(this)">
+                <div class="model-type-icon">🌊</div>
+                <div class="model-type-name">TensorFlow</div>
+                <div class="model-type-desc">Google 开源机器学习框架模型</div>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button class="btn btn-outline" onclick="location.href='console-ai-model.html'">取消</button>
+              <button class="btn btn-primary" onclick="goStep(2)">下一步</button>
+            </div>
+          </div>
+
+          <!-- Step 2: 上传模型 -->
+          <div class="step-content" id="step-content-2">
+            <div class="upload-area">
+              <div class="upload-icon">☁</div>
+              <div class="upload-title">点击或拖拽上传模型文件</div>
+              <div class="upload-desc">支持 .onnx / .pt / .pth / .pb / .h5 格式</div>
+              <div class="upload-formats">文件大小不超过 5GB</div>
+            </div>
+
+            <div class="model-form">
+              <div class="form-group">
+                <label class="form-label">模型名称</label>
+                <input class="form-input" placeholder="请输入模型名称">
+              </div>
+              <div class="form-group">
+                <label class="form-label">模型描述</label>
+                <input class="form-input" placeholder="请输入模型描述（选填）">
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button class="btn btn-outline" onclick="goStep(1)">上一步</button>
+              <button class="btn btn-primary" onclick="goStep(3)">提交</button>
+            </div>
+          </div>
+
+          <!-- Step 3: 完成 -->
+          <div class="step-content" id="step-content-3">
+            <div class="empty-state" style="padding:40px;">
+              <div style="font-size:48px;">✅</div>
+              <div class="empty-state-title">模型导入成功</div>
+              <div class="empty-state-desc">模型已进入转码队列，转码完成后即可部署运行</div>
+            </div>
+            <div class="step-actions">
+              <button class="btn btn-outline" onclick="location.href='console-ai-model.html'">返回模型管理</button>
+              <button class="btn btn-primary" onclick="location.href='console-ai-model.html'">查看模型</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    function selectType(el) {
+      document.querySelectorAll('.model-type-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function goStep(n) {
+      document.querySelectorAll('.step-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('step-content-' + n).classList.add('active');
+
+      for (let i = 1; i <= 3; i++) {
+        const step = document.getElementById('step-' + i);
+        step.classList.remove('active', 'completed');
+        if (i < n) step.classList.add('completed');
+        else if (i === n) step.classList.add('active');
+      }
+      for (let i = 1; i <= 2; i++) {
+        const line = document.getElementById('line-' + i);
+        line.classList.toggle('completed', i < n);
+      }
+    }
+  </script>
+</body>
+</html>

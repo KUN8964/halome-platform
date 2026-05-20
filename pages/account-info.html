@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账户信息 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .account-page .page-title { margin-bottom: 8px; }
+    .account-page .page-subtitle { margin-bottom: 32px; }
+
+    .info-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .info-card .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .info-row {
+      display: grid;
+      grid-template-columns: 120px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .row-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .info-row .row-value {
+      font-size: 14px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .info-row .row-action {
+      font-size: 13px;
+      color: var(--text-link);
+      cursor: pointer;
+    }
+    .info-row .row-action:hover { text-decoration: underline; }
+
+    .auth-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+    }
+    .auth-status.verified {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+    }
+    .auth-status.unverified {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-yellow);
+    }
+    .auth-status.pending {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent-blue);
+    }
+
+    .security-item {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .security-item:last-child { border-bottom: none; }
+    .security-item .sec-label { font-size: 14px; color: var(--text-primary); }
+    .security-item .sec-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .security-item .sec-status { font-size: 13px; color: var(--text-muted); }
+    .security-item .sec-action {
+      font-size: 13px;
+      color: var(--text-link);
+      cursor: pointer;
+    }
+    .security-item .sec-action:hover { text-decoration: underline; }
+
+    .device-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .device-item:last-child { border-bottom: none; }
+    .device-info { display: flex; align-items: center; gap: 12px; }
+    .device-icon { font-size: 20px; opacity: 0.6; }
+    .device-name { font-size: 14px; color: var(--text-primary); }
+    .device-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .device-current {
+      font-size: 12px;
+      color: var(--accent-green);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+  </style>
+</head>
+<body data-page="account-info">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area account-page">
+        <h1 class="page-title">账户信息</h1>
+        <p class="page-subtitle">管理您的账户信息与安全设置</p>
+
+        <!-- 基本信息 -->
+        <div class="info-card">
+          <div class="card-title">基本信息</div>
+          <div class="info-row">
+            <span class="row-label">企业/机构名称</span>
+            <span class="row-value">杭州七七八八久久有限公司</span>
+            <span class="row-action">修改</span>
+          </div>
+          <div class="info-row">
+            <span class="row-label">认证状态</span>
+            <span class="row-value">
+              <span class="auth-status verified">✓ 已认证</span>
+            </span>
+            <span class="row-action">查看认证</span>
+          </div>
+          <div class="info-row">
+            <span class="row-label">企业码</span>
+            <span class="row-value" style="font-family:monospace;">QSCG</span>
+            <span class="row-action">复制</span>
+          </div>
+          <div class="info-row">
+            <span class="row-label">登录手机号</span>
+            <span class="row-value">137 **** 1111</span>
+            <span class="row-action">修改</span>
+          </div>
+        </div>
+
+        <!-- 安全设置 -->
+        <div class="info-card">
+          <div class="card-title">安全设置</div>
+          <div class="security-item">
+            <div>
+              <div class="sec-label">短信验证</div>
+              <div class="sec-desc">登录及敏感操作时需短信验证</div>
+            </div>
+            <span class="sec-status">已开启</span>
+            <span class="sec-action">关闭</span>
+          </div>
+          <div class="security-item">
+            <div>
+              <div class="sec-label">登录状态</div>
+              <div class="sec-desc">当前在线</div>
+            </div>
+            <span class="sec-status">在线</span>
+            <span class="sec-action">下线其他设备</span>
+          </div>
+        </div>
+
+        <!-- 登录设备 -->
+        <div class="info-card">
+          <div class="card-title">登录设备</div>
+          <div class="device-item">
+            <div class="device-info">
+              <span class="device-icon">💻</span>
+              <div>
+                <div class="device-name">MacBook Pro - Chrome</div>
+                <div class="device-detail">杭州 · 最近活跃: 刚刚</div>
+              </div>
+            </div>
+            <span class="device-current">当前设备</span>
+          </div>
+          <div class="device-item">
+            <div class="device-info">
+              <span class="device-icon">📱</span>
+              <div>
+                <div class="device-name">iPhone 15 Pro - Safari</div>
+                <div class="device-detail">杭州 · 最近活跃: 2小时前</div>
+              </div>
+            </div>
+            <span class="row-action" style="cursor:pointer;color:var(--accent-red);font-size:13px;">下线</span>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+</body>
+</html>

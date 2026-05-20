@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <style>
+    .price-page .section-title { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+    .price-page .section-title .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 400; margin-left: 12px; }
+    .price-page .service-table { width: 100%; }
+    .price-page .service-table td { padding: 14px 16px; border-bottom: 1px solid var(--border-secondary); font-size: 14px; }
+    .price-page .service-table td:first-child { color: var(--text-secondary); width: 40%; }
+    .price-page .service-table td:nth-child(2) { color: var(--text-primary); font-weight: 500; }
+    .price-page .service-table td:nth-child(3) { color: var(--text-secondary); }
+
+    .custom-input-group { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+    .custom-input-group .counter-btn { width: 32px; height: 32px; border-radius: var(--radius-md); border: 1px solid var(--border-primary); background: transparent; color: var(--text-secondary); font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .custom-input-group .counter-btn:hover { border-color: var(--text-muted); color: var(--text-primary); }
+    .custom-input-group .counter-value { min-width: 60px; text-align: center; font-size: 14px; }
+    .custom-input-group .counter-unit { font-size: 13px; color: var(--text-muted); }
+
+    .recharge-options { display: flex; flex-wrap: wrap; gap: 12px; }
+    .recharge-btn { padding: 8px 24px; border-radius: var(--radius-full); border: 1px solid var(--border-primary); background: transparent; color: var(--text-secondary); font-size: 13px; cursor: pointer; transition: all var(--transition-fast); }
+    .recharge-btn:hover { border-color: var(--text-muted); color: var(--text-primary); }
+    .recharge-btn.active { border-color: var(--accent-purple); color: var(--accent-purple-light); background: rgba(139, 92, 246, 0.08); }
+
+    .bank-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 16px; }
+    .bank-info-item .bank-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .bank-info-item .bank-value { font-size: 14px; color: var(--text-primary); font-weight: 500; }
+
+    .bank-note { font-size: 13px; color: var(--text-muted); line-height: 1.8; }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-secondary);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 50;
+    }
+    .bottom-bar .detail-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 4px; }
+    .bottom-bar .detail-text { font-size: 13px; color: var(--text-muted); }
+    .bottom-bar .total-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+    .bottom-bar .total-value { font-size: 22px; color: var(--accent-yellow); font-weight: 600; }
+    .bottom-bar .total-value .currency { font-size: 14px; margin-left: 4px; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .option-row { margin-bottom: 20px; }
+    .option-row-label { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; display: flex; justify-content: space-between; }
+    .option-row-label .label-right { color: var(--text-muted); font-size: 12px; }
+
+    .section-divider { height: 1px; background: var(--border-secondary); margin: 28px 0; }
+
+    .content-area { padding-bottom: 100px; }
+  </style>
+</head>
+<body data-page="price-calculator">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area price-page">
+        <div class="tabs">
+          <button class="tab" data-tab="cloud-storage">云存储</button>
+          <button class="tab active" data-tab="evidence">电子存证</button>
+          <button class="tab" data-tab="cloud-compute">云计算</button>
+        </div>
+
+        <!-- 云存储 Tab -->
+        <div class="tab-content" id="tab-cloud-storage">
+          <div class="section">
+            <div class="section-title">标准存储 <span class="subtitle">0.125元/GB/月</span></div>
+            <div class="option-row">
+              <div class="option-row-label"><span>标准存储空间</span><span class="label-right">有效期</span></div>
+              <div class="option-group">
+                <button class="option-btn">50 GB</button>
+                <button class="option-btn active">100 GB</button>
+                <button class="option-btn">500 GB</button>
+                <button class="option-btn">1 TB</button>
+                <button class="option-btn">5 TB</button>
+                <button class="option-btn">10 TB</button>
+              </div>
+              <div class="option-group">
+                <button class="option-btn">1 PB</button>
+                <button class="option-btn">2 PB</button>
+                <button class="option-btn">5 PB</button>
+                <button class="option-btn">10 PB</button>
+                <button class="option-btn">20 PB</button>
+                <button class="option-btn">50 PB</button>
+              </div>
+              <div class="option-group" style="margin-top:16px;">
+                <button class="option-btn">1 个月</button>
+                <button class="option-btn active">3 个月</button>
+                <button class="option-btn">6 个月</button>
+                <button class="option-btn">1 年</button>
+                <button class="option-btn">2 年</button>
+                <button class="option-btn">3 年</button>
+              </div>
+            </div>
+            <div class="option-row">
+              <div class="option-row-label">自选存储空间</div>
+              <div class="custom-input-group">
+                <button class="counter-btn">−</button>
+                <span class="counter-value">0</span>
+                <button class="counter-btn">+</button>
+                <span class="counter-unit">TB</span>
+                <button class="counter-btn">−</button>
+                <span class="counter-value">0</span>
+                <button class="counter-btn">+</button>
+                <span class="counter-unit">PB</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="section">
+            <div class="section-title">数据取回 <span class="subtitle">0.45元/GB/月</span></div>
+            <div class="option-row">
+              <div class="option-row-label"><span>标准存储空间</span><span class="label-right">有效期</span></div>
+              <div class="option-group">
+                <button class="option-btn">50 GB</button>
+                <button class="option-btn active">100 GB</button>
+                <button class="option-btn">500 GB</button>
+                <button class="option-btn">1 TB</button>
+                <button class="option-btn">5 TB</button>
+                <button class="option-btn">10 TB</button>
+              </div>
+              <div class="option-group">
+                <button class="option-btn">1 PB</button>
+                <button class="option-btn">2 PB</button>
+                <button class="option-btn">5 PB</button>
+                <button class="option-btn">10 PB</button>
+                <button class="option-btn">20 PB</button>
+                <button class="option-btn">50 PB</button>
+              </div>
+              <div class="option-group" style="margin-top:16px;">
+                <button class="option-btn">1 个月</button>
+                <button class="option-btn active">3 个月</button>
+                <button class="option-btn">6 个月</button>
+                <button class="option-btn">1 年</button>
+                <button class="option-btn">2 年</button>
+                <button class="option-btn">3 年</button>
+              </div>
+            </div>
+            <div class="option-row">
+              <div class="option-row-label">自选存储空间</div>
+              <div class="custom-input-group">
+                <button class="counter-btn">−</button>
+                <span class="counter-value">0</span>
+                <button class="counter-btn">+</button>
+                <span class="counter-unit">TB</span>
+                <button class="counter-btn">−</button>
+                <span class="counter-value">0</span>
+                <button class="counter-btn">+</button>
+                <span class="counter-unit">PB</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="section">
+            <div class="section-title">按需充值 <span class="subtitle">按实际使用量扣费</span></div>
+            <div class="recharge-options">
+              <button class="recharge-btn">¥ 10</button>
+              <button class="recharge-btn">¥ 50</button>
+              <button class="recharge-btn active">¥ 100</button>
+              <button class="recharge-btn">¥ 500</button>
+              <button class="recharge-btn">¥ 1000</button>
+              <button class="recharge-btn">自定义</button>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="section">
+            <div class="section-title">线下充值</div>
+            <div class="bank-info">
+              <div class="bank-info-item">
+                <div class="bank-label">开户名</div>
+                <div class="bank-value">杭州光宇云计算科技有限公司</div>
+              </div>
+              <div class="bank-info-item">
+                <div class="bank-label">开户行</div>
+                <div class="bank-value">中国农业银行股份有限公司杭州城东支行</div>
+              </div>
+              <div class="bank-info-item">
+                <div class="bank-label">账号</div>
+                <div class="bank-value">19015101040068644</div>
+              </div>
+            </div>
+            <div class="bank-note">
+              说明：<br>
+              在转账或汇款完成后，请将付款凭证发送给您的专属销售人员。<br>
+              我们将在1-2个工作日内，为您的账号完成充值。<br>
+              汇款信息：单位名称、汇款银行、汇款账户、汇款金额、汇款时间。<br>
+              如有疑问，请致电客服：133 95817 860
+            </div>
+          </div>
+        </div>
+
+        <!-- 电子存证 Tab -->
+        <div class="tab-content active" id="tab-evidence">
+          <div class="section">
+            <div class="section-title">存证服务单价 <span class="subtitle">按实际使用量扣费</span></div>
+            <table class="service-table">
+              <tr>
+                <td style="color:var(--text-muted);">服务类型</td>
+                <td style="color:var(--text-muted);">单价</td>
+                <td style="color:var(--text-muted);">说明</td>
+              </tr>
+              <tr>
+                <td>电子数据DNA存证</td>
+                <td>0.03元/条</td>
+                <td>支持文本、文件、哈希存证，存证期限3年</td>
+              </tr>
+              <tr>
+                <td>实时出证服务</td>
+                <td>1.5元/份</td>
+                <td>在线生成电子证据保全证书</td>
+              </tr>
+              <tr>
+                <td>正式公证书</td>
+                <td>1200元/每次</td>
+                <td>加盖公证处公章，全国法院认可</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="section">
+            <div class="section-title">按需充值</div>
+            <div class="recharge-options">
+              <button class="recharge-btn">¥ 10</button>
+              <button class="recharge-btn">¥ 50</button>
+              <button class="recharge-btn active">¥ 100</button>
+              <button class="recharge-btn">¥ 500</button>
+              <button class="recharge-btn">¥ 1000</button>
+              <button class="recharge-btn">自定义</button>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="section">
+            <div class="section-title">线下充值</div>
+            <div class="bank-info">
+              <div class="bank-info-item">
+                <div class="bank-label">开户名</div>
+                <div class="bank-value">杭州光宇云计算科技有限公司</div>
+              </div>
+              <div class="bank-info-item">
+                <div class="bank-label">开户行</div>
+                <div class="bank-value">中国农业银行股份有限公司杭州城东支行</div>
+              </div>
+              <div class="bank-info-item">
+                <div class="bank-label">账号</div>
+                <div class="bank-value">19015101040068644</div>
+              </div>
+            </div>
+            <div class="bank-note">
+              说明：<br>
+              在转账或汇款完成后，请将付款凭证发送给您的专属销售人员。<br>
+              我们将在1-2个工作日内，为您的账号完成充值。<br>
+              汇款信息：单位名称、汇款银行、汇款账户、汇款金额、汇款时间。<br>
+              如有疑问，请致电客服：133 95817 860
+            </div>
+          </div>
+        </div>
+
+        <!-- 云计算 Tab -->
+        <div class="tab-content" id="tab-cloud-compute">
+          <div class="section">
+            <div class="section-title">标准套餐 <span class="subtitle">套餐更优惠</span></div>
+            <div class="option-row">
+              <div class="option-row-label"><span>输入量</span><span class="label-right">有效期</span></div>
+              <div class="option-group">
+                <button class="option-btn">50 M</button>
+                <button class="option-btn active">100 M</button>
+                <button class="option-btn">500 M</button>
+                <button class="option-btn">1 B</button>
+                <button class="option-btn">5 B</button>
+                <button class="option-btn">10 B</button>
+              </div>
+              <div class="option-group" style="margin-top:16px;">
+                <button class="option-btn">1 个月</button>
+                <button class="option-btn active">3 个月</button>
+                <button class="option-btn">6 个月</button>
+              </div>
+            </div>
+            <div class="option-row">
+              <div class="option-row-label"><span>输出量</span><span class="label-right">有效期</span></div>
+              <div class="option-group">
+                <button class="option-btn">50 M</button>
+                <button class="option-btn">100 M</button>
+                <button class="option-btn">500 M</button>
+                <button class="option-btn">1 B</button>
+                <button class="option-btn">5 B</button>
+                <button class="option-btn">10 B</button>
+              </div>
+              <div class="option-group" style="margin-top:16px;">
+                <button class="option-btn">1 个月</button>
+                <button class="option-btn active">3 个月</button>
+                <button class="option-btn">6 个月</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="section">
+            <div class="section-title">按需充值 <span class="subtitle">每1K字仅¥0.006</span></div>
+            <div class="recharge-options">
+              <button class="recharge-btn">¥ 10</button>
+              <button class="recharge-btn">¥ 50</button>
+              <button class="recharge-btn active">¥ 100</button>
+              <button class="recharge-btn">¥ 500</button>
+              <button class="recharge-btn">¥ 1000</button>
+              <button class="recharge-btn">自定义</button>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="section">
+            <div class="section-title">线下充值</div>
+            <div class="bank-info">
+              <div class="bank-info-item">
+                <div class="bank-label">开户名</div>
+                <div class="bank-value">杭州光宇云计算科技有限公司</div>
+              </div>
+              <div class="bank-info-item">
+                <div class="bank-label">开户行</div>
+                <div class="bank-value">中国农业银行股份有限公司杭州城东支行</div>
+              </div>
+              <div class="bank-info-item">
+                <div class="bank-label">账号</div>
+                <div class="bank-value">19015101040068644</div>
+              </div>
+            </div>
+            <div class="bank-note">
+              说明：<br>
+              在转账或汇款完成后，请将付款凭证发送给您的专属销售人员。<br>
+              我们将在1-2个工作日内，为您的账号完成充值。<br>
+              汇款信息：单位名称、汇款银行、汇款账户、汇款金额、汇款时间。<br>
+              如有疑问，请致电客服：133 95817 860
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div class="bottom-bar">
+        <div>
+          <div class="detail-label">费用明细：</div>
+          <div class="detail-text" id="bottom-detail">标准套餐:输入量100 M*购买时长:2 个月；输出量50 M*购买时长:2 个月。</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:24px;">
+          <div>
+            <div class="total-label">应付费用：</div>
+            <div class="total-value">388.00 <span class="currency">元</span></div>
+          </div>
+          <button class="btn btn-primary btn-lg">立即购买</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar.js"></script>
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        const target = this.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + target).classList.add('active');
+        updateBottomBar(target);
+      });
+    });
+
+    // Option button toggle
+    document.querySelectorAll('.option-btn, .recharge-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const parent = this.closest('.option-group, .recharge-options');
+        if (parent) {
+          parent.querySelectorAll('.option-btn, .recharge-btn').forEach(b => b.classList.remove('active'));
+        }
+        this.classList.add('active');
+      });
+    });
+
+    function updateBottomBar(tab) {
+      const detail = document.getElementById('bottom-detail');
+      const texts = {
+        'cloud-storage': '标准存储:100 GB*有效期:2 个月；数据取回:100 GB*购买时长:2 个月。',
+        'evidence': '电子数据DNA存证: 按量计费；实时出证: 按量计费。',
+        'cloud-compute': '标准套餐:输入量100 M*购买时长:2 个月；输出量50 M*购买时长:2 个月。'
+      };
+      detail.textContent = texts[tab] || '';
+    }
+  </script>
+</body>
+</html>

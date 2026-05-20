@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>账单 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .bills-page .page-title { margin-bottom: 8px; }
+    .bills-page .page-subtitle { margin-bottom: 32px; }
+
+    /* Current plan */
+    .current-plan {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .plan-title { font-size: 16px; font-weight: 600; }
+    .plan-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .plan-item {
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+    }
+    .plan-item .plan-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .plan-item .plan-value { font-size: 18px; font-weight: 600; }
+    .plan-item .plan-extra { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Bill table section */
+    .bill-section {
+      margin-bottom: 32px;
+    }
+    .bill-section .section-title { margin-bottom: 16px; }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .filter-bar .filter-input {
+      padding: 7px 12px;
+      font-size: 13px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-md);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      outline: none;
+    }
+    .filter-bar .filter-input:focus { border-color: var(--accent-purple); }
+    .filter-bar .filter-select {
+      padding: 7px 12px;
+      font-size: 13px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-md);
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .bill-table th, .bill-table td { padding: 14px 16px; }
+    .bill-table .order-id { font-family: monospace; font-size: 12px; color: var(--text-muted); }
+    .bill-table .amount { font-weight: 500; color: var(--text-primary); }
+    .bill-table .bill-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .bill-status.paid { color: var(--accent-green); }
+    .bill-status.pending { color: var(--accent-yellow); }
+    .bill-status.cancelled { color: var(--text-muted); }
+  </style>
+</head>
+<body data-page="account-bills">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area bills-page">
+        <h1 class="page-title">账单与发票</h1>
+        <p class="page-subtitle">查看您的消费账单和套餐信息</p>
+
+        <!-- 当前套餐 -->
+        <div class="current-plan">
+          <div class="plan-header">
+            <div class="plan-title">当前套餐</div>
+            <button class="btn btn-sm btn-primary">升级套餐</button>
+          </div>
+          <div class="plan-grid">
+            <div class="plan-item">
+              <div class="plan-label">标准存储</div>
+              <div class="plan-value">100 GB</div>
+              <div class="plan-extra">已用 539.1 MB</div>
+            </div>
+            <div class="plan-item">
+              <div class="plan-label">取回统计</div>
+              <div class="plan-value">100 GB</div>
+              <div class="plan-extra">已用 123.3 MB</div>
+            </div>
+            <div class="plan-item">
+              <div class="plan-label">Token输入量</div>
+              <div class="plan-value">1,000K</div>
+              <div class="plan-extra">已用 456.8K</div>
+            </div>
+            <div class="plan-item">
+              <div class="plan-label">Token输出量</div>
+              <div class="plan-value">500K</div>
+              <div class="plan-extra">已用 234.6K</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 账单列表 -->
+        <div class="bill-section">
+          <h2 class="section-title">账单明细</h2>
+
+          <div class="filter-bar">
+            <select class="filter-select">
+              <option>全部时间</option>
+              <option>最近7天</option>
+              <option>最近30天</option>
+              <option>最近3个月</option>
+            </select>
+            <select class="filter-select">
+              <option>全部服务</option>
+              <option>云存储</option>
+              <option>AI推理</option>
+              <option>数据存证</option>
+            </select>
+            <select class="filter-select">
+              <option>全部状态</option>
+              <option>已支付</option>
+              <option>待支付</option>
+              <option>已取消</option>
+            </select>
+            <input class="filter-input" placeholder="搜索订单号..." style="width:200px;">
+          </div>
+
+          <table class="data-table bill-table">
+            <thead>
+              <tr>
+                <th>订单编号</th>
+                <th>服务名称</th>
+                <th>服务内容</th>
+                <th>实付金额</th>
+                <th>时间</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="order-id">ORD202505200001</td>
+                <td>云存储</td>
+                <td class="cell-muted">标准存储 100GB · 月付</td>
+                <td class="amount">¥ 99.00</td>
+                <td class="cell-muted">2025-05-20</td>
+                <td><span class="bill-status paid">● 已支付</span></td>
+              </tr>
+              <tr>
+                <td class="order-id">ORD202505150002</td>
+                <td>AI推理</td>
+                <td class="cell-muted">Token消耗 · 按量计费</td>
+                <td class="amount">¥ 456.69</td>
+                <td class="cell-muted">2025-05-15</td>
+                <td><span class="bill-status paid">● 已支付</span></td>
+              </tr>
+              <tr>
+                <td class="order-id">ORD202505100003</td>
+                <td>数据存证</td>
+                <td class="cell-muted">存证服务 · 50次</td>
+                <td class="amount">¥ 200.00</td>
+                <td class="cell-muted">2025-05-10</td>
+                <td><span class="bill-status paid">● 已支付</span></td>
+              </tr>
+              <tr>
+                <td class="order-id">ORD202505050004</td>
+                <td>云存储</td>
+                <td class="cell-muted">数据取回 100GB · 月付</td>
+                <td class="amount">¥ 49.00</td>
+                <td class="cell-muted">2025-05-05</td>
+                <td><span class="bill-status paid">● 已支付</span></td>
+              </tr>
+              <tr>
+                <td class="order-id">ORD202505010005</td>
+                <td>AI推理</td>
+                <td class="cell-muted">模型部署 · 月付</td>
+                <td class="amount">¥ 551.00</td>
+                <td class="cell-muted">2025-05-01</td>
+                <td><span class="bill-status paid">● 已支付</span></td>
+              </tr>
+              <tr>
+                <td class="order-id">ORD202504250006</td>
+                <td>云存储</td>
+                <td class="cell-muted">标准存储 100GB · 月付</td>
+                <td class="amount">¥ 99.00</td>
+                <td class="cell-muted">2025-04-25</td>
+                <td><span class="bill-status paid">● 已支付</span></td>
+              </tr>
+              <tr>
+                <td class="order-id">ORD202504200007</td>
+                <td>数据存证</td>
+                <td class="cell-muted">实时出证 · 20次</td>
+                <td class="amount">¥ 150.00</td>
+                <td class="cell-muted">2025-04-20</td>
+                <td><span class="bill-status cancelled">● 已取消</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="pagination">
+            <span>共 24 条</span>
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+</body>
+</html>

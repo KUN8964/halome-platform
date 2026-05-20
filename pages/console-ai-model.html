@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI模型管理 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .page-header .page-title { margin-bottom: 0; }
+
+    /* Overview Stats */
+    .overview-stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .overview-stats .stat-item { gap: 6px; }
+    .overview-stats .stat-label { font-size: 12px; color: var(--text-muted); }
+    .overview-stats .stat-value { font-size: 22px; font-weight: 600; }
+    .overview-stats .stat-value .view-link {
+      font-size: 12px; color: var(--text-link); font-weight: 400; margin-left: 4px; cursor: pointer;
+    }
+
+    .secondary-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .secondary-stats .stat-value { font-size: 20px; }
+
+    /* Pie chart + legend row */
+    .chart-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .chart-legend-row .legend { flex-direction: column; gap: 10px; }
+
+    /* Model List Section */
+    .model-list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .model-list-header .section-title { margin-bottom: 0; }
+
+    /* Sub tabs for model list */
+    .model-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .model-tab {
+      padding: 6px 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-radius: var(--radius-full);
+      border: 1px solid transparent;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      background: none;
+    }
+    .model-tab:hover {
+      color: var(--text-primary);
+      background: var(--bg-hover);
+    }
+    .model-tab.active {
+      color: var(--text-accent);
+      background: var(--bg-sidebar-active);
+      border-color: var(--border-accent);
+    }
+
+    .model-tab-content { display: none; }
+    .model-tab-content.active { display: block; }
+
+    /* Model table */
+    .model-table th, .model-table td { padding: 14px 16px; }
+    .model-table .model-name { font-weight: 500; font-size: 14px; }
+    .model-table .status-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+    }
+    .model-table .action-links {
+      display: flex;
+      gap: 12px;
+    }
+    .model-table .action-links a {
+      color: var(--text-link);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .model-table .action-links a:hover { text-decoration: underline; }
+    .model-table .action-links a.danger { color: var(--accent-red); }
+
+    /* Toggle in table */
+    .table-toggle { display: flex; justify-content: center; }
+
+    /* Usage Section */
+    .usage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .usage-stats-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .usage-stat .usage-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .usage-stat .usage-value {
+      font-size: 24px; font-weight: 600;
+      display: flex; align-items: baseline; gap: 6px;
+    }
+    .usage-stat .usage-value .currency { font-size: 13px; color: var(--text-muted); font-weight: 400; }
+
+    .monthly-usage {
+      margin-bottom: 24px;
+    }
+    .monthly-usage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .monthly-usage-header .usage-title { font-size: 14px; color: var(--text-secondary); }
+    .monthly-usage-header .usage-amount { font-size: 13px; color: var(--text-muted); }
+    .month-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    /* Line chart placeholder */
+    .line-chart-placeholder {
+      height: 160px;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 8px;
+    }
+    .line-chart-svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Token bar chart */
+    .token-chart {
+      margin-top: 24px;
+    }
+    .token-chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .token-chart-header .token-title { font-size: 14px; color: var(--text-secondary); }
+    .token-chart-header .token-value { font-size: 13px; color: var(--text-muted); }
+    .bar-chart-placeholder {
+      height: 140px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 4px;
+    }
+    .bar-group {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 2px;
+      height: 100%;
+    }
+    .bar {
+      width: 6px;
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* Y-axis labels */
+    .chart-with-axis {
+      display: flex;
+      gap: 8px;
+    }
+    .y-axis {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      padding: 8px 0;
+      text-align: right;
+    }
+    .chart-area { flex: 1; }
+    .x-axis-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 8px;
+      padding: 0 8px;
+    }
+  </style>
+</head>
+<body data-page="console-ai-model">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area">
+        <div class="page-header">
+          <h1 class="page-title">模型管理</h1>
+          <button class="btn btn-primary">立即充值</button>
+        </div>
+
+        <!-- 模型概览 -->
+        <div class="overview-stats">
+          <div class="stat-item">
+            <div class="stat-label">已部署AI模型</div>
+            <div class="stat-value">3/5</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">正在运行数</div>
+            <div class="stat-value">1</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">异常模型</div>
+            <div class="stat-value">1 <span class="view-link">查看</span></div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">模型收益</div>
+            <div class="stat-value">977,355.69</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">调用分布</div>
+            <div class="chart-legend-row" style="margin-top:8px;">
+              <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Labels</div>
+              </div>
+              <div class="pie-placeholder" style="width:80px;height:80px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="secondary-stats">
+          <div class="stat-item">
+            <div class="stat-label">本周总调用数</div>
+            <div class="stat-value">35,190 次</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">调用最多模型</div>
+            <div class="stat-value">Model-X</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">QPS峰值</div>
+            <div class="stat-value">5,775</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">接口数</div>
+            <div class="stat-value">9</div>
+          </div>
+        </div>
+
+        <!-- 模型列表 -->
+        <div class="section">
+          <div class="model-list-header">
+            <h2 class="section-title">模型列表</h2>
+            <button class="btn btn-primary btn-sm" onclick="location.href='console-ai-model-import.html'">导入模型</button>
+          </div>
+
+          <div class="model-tabs">
+            <button class="model-tab active" data-model-tab="private">自由模型</button>
+            <button class="model-tab" data-model-tab="public">公用模型</button>
+            <button class="model-tab" data-model-tab="revenue">模型收益</button>
+          </div>
+
+          <!-- 自由模型 Tab -->
+          <div class="model-tab-content active" id="model-tab-private">
+            <table class="data-table model-table">
+              <thead>
+                <tr>
+                  <th>模型名称</th>
+                  <th>运行状态</th>
+                  <th>API Key</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="model-name">gemma3:7b-it-q4_k_m</td>
+                  <td>
+                    <span class="status-text"><span class="status-dot running"></span>运行中</span>
+                  </td>
+                  <td><a class="cell-link">查看</a></td>
+                  <td>
+                    <div class="action-links">
+                      <a>停止</a>
+                      <a>公开模型</a>
+                      <a class="danger">删除模型</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="model-name">Model-NPU-6b</td>
+                  <td>
+                    <span class="status-text"><span class="status-dot stopped"></span>未部署</span>
+                  </td>
+                  <td><a class="cell-link">创建</a></td>
+                  <td>
+                    <div class="action-links">
+                      <a>运行</a>
+                      <a>公开模型</a>
+                      <a class="danger">删除模型</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="model-name">Glm-4.6</td>
+                  <td>
+                    <span class="status-text"><span class="status-dot error"></span>转码失败</span>
+                  </td>
+                  <td><a class="cell-link">创建</a></td>
+                  <td>
+                    <div class="action-links">
+                      <a>重试</a>
+                      <a>公开模型</a>
+                      <a class="danger">删除模型</a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="model-name">Model-01</td>
+                  <td>
+                    <span class="status-text"><span class="status-dot warning"></span>转码中</span>
+                  </td>
+                  <td><a class="cell-link">创建</a></td>
+                  <td>
+                    <div class="action-links">
+                      <a>启用</a>
+                      <a>公开模型</a>
+                      <a class="danger">删除模型</a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 公用模型 Tab -->
+          <div class="model-tab-content" id="model-tab-public">
+            <table class="data-table model-table">
+              <thead>
+                <tr>
+                  <th>模型名称</th>
+                  <th>运行状态</th>
+                  <th>模型类型</th>
+                  <th>API Key</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="model-name">Minimax-m2</td>
+                  <td>
+                    <span class="status-text"><span class="status-dot running"></span>运行中</span>
+                  </td>
+                  <td class="cell-muted">XXX</td>
+                  <td><a class="cell-link">查看</a></td>
+                  <td>
+                    <div class="table-toggle">
+                      <div class="toggle active"><div class="toggle-knob"></div></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="model-name">gpt-oss:120b</td>
+                  <td>
+                    <span class="status-text"><span class="status-dot stopped"></span>未运行</span>
+                  </td>
+                  <td class="cell-muted">AAA</td>
+                  <td><a class="cell-link">申请</a></td>
+                  <td>
+                    <div class="table-toggle">
+                      <div class="toggle active"><div class="toggle-knob"></div></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="model-name">Deepseek-3.1:671b</td>
+                  <td>
+                    <span class="status-text"><span class="status-dot stopped"></span>未运行</span>
+                  </td>
+                  <td class="cell-muted">BBB</td>
+                  <td><a class="cell-link">申请</a></td>
+                  <td>
+                    <div class="table-toggle">
+                      <div class="toggle active"><div class="toggle-knob"></div></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 模型收益 Tab -->
+          <div class="model-tab-content" id="model-tab-revenue">
+            <table class="data-table model-table">
+              <thead>
+                <tr>
+                  <th>模型名称</th>
+                  <th>运行时长</th>
+                  <th>模型类型</th>
+                  <th>调用次数</th>
+                  <th>模型收入</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="model-name">Minimax-m2</td>
+                  <td class="cell-muted">190 天</td>
+                  <td class="cell-muted">XXX</td>
+                  <td class="cell-muted">876,549</td>
+                  <td>¥ 1,209</td>
+                </tr>
+                <tr>
+                  <td class="model-name">gpt-oss:120b</td>
+                  <td class="cell-muted">190 天</td>
+                  <td class="cell-muted">AAA</td>
+                  <td class="cell-muted">376,533</td>
+                  <td>¥ 1,552</td>
+                </tr>
+                <tr>
+                  <td class="model-name">Deepseek-3.1:671b</td>
+                  <td class="cell-muted">190 天</td>
+                  <td class="cell-muted">BBB</td>
+                  <td class="cell-muted">176,132</td>
+                  <td>¥ 1,267</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 用量信息 -->
+        <div class="section">
+          <h2 class="section-title">用量信息</h2>
+          <div class="usage-stats-row">
+            <div class="usage-stat">
+              <div class="usage-label">充值余额</div>
+              <div class="usage-value">
+                <span>¥</span> 355.69 <span class="currency">CNY</span>
+              </div>
+            </div>
+            <div class="usage-stat">
+              <div class="usage-label">本月消费</div>
+              <div class="usage-value">
+                <span>¥</span> 1355.69 <span class="currency">CNY</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="monthly-usage">
+            <div class="monthly-usage-header">
+              <div>
+                <div class="usage-title">每月用量</div>
+                <div class="usage-amount">消费金额 ¥1355.69</div>
+              </div>
+              <button class="month-selector">2025-10月 ▼</button>
+            </div>
+            <div class="chart-with-axis">
+              <div class="y-axis">
+                <span>¥1500</span>
+                <span>¥0</span>
+              </div>
+              <div class="chart-area">
+                <svg class="line-chart-svg" viewBox="0 0 800 160" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,120 Q50,100 100,110 T200,90 T300,100 T400,80 T500,95 T600,70 T700,85 T800,60" fill="none" stroke="#8b5cf6" stroke-width="2"/>
+                  <path d="M0,120 Q50,100 100,110 T200,90 T300,100 T400,80 T500,95 T600,70 T700,85 T800,60 L800,160 L0,160 Z" fill="url(#lineGrad)"/>
+                </svg>
+                <div class="x-axis-labels">
+                  <span>10-1</span>
+                  <span>10-31</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="token-chart">
+            <div class="token-chart-header">
+              <div>
+                <div class="token-title">Tokens</div>
+                <div class="token-value">784,993</div>
+              </div>
+              <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Labels</div>
+              </div>
+            </div>
+            <div class="chart-with-axis">
+              <div class="y-axis">
+                <span>800,000</span>
+                <span>0</span>
+              </div>
+              <div class="chart-area">
+                <div class="bar-chart-placeholder">
+                  <div class="bar-group">
+                    <div class="bar" style="height:45%;background:#6366f1"></div>
+                    <div class="bar" style="height:30%;background:#10b981"></div>
+                    <div class="bar" style="height:20%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:60%;background:#6366f1"></div>
+                    <div class="bar" style="height:40%;background:#10b981"></div>
+                    <div class="bar" style="height:25%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:35%;background:#6366f1"></div>
+                    <div class="bar" style="height:25%;background:#10b981"></div>
+                    <div class="bar" style="height:15%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:50%;background:#6366f1"></div>
+                    <div class="bar" style="height:35%;background:#10b981"></div>
+                    <div class="bar" style="height:20%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:30%;background:#6366f1"></div>
+                    <div class="bar" style="height:20%;background:#10b981"></div>
+                    <div class="bar" style="height:10%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:40%;background:#6366f1"></div>
+                    <div class="bar" style="height:30%;background:#10b981"></div>
+                    <div class="bar" style="height:18%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:55%;background:#6366f1"></div>
+                    <div class="bar" style="height:38%;background:#10b981"></div>
+                    <div class="bar" style="height:22%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:25%;background:#6366f1"></div>
+                    <div class="bar" style="height:18%;background:#10b981"></div>
+                    <div class="bar" style="height:12%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:48%;background:#6366f1"></div>
+                    <div class="bar" style="height:32%;background:#10b981"></div>
+                    <div class="bar" style="height:18%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:35%;background:#6366f1"></div>
+                    <div class="bar" style="height:22%;background:#10b981"></div>
+                    <div class="bar" style="height:14%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:42%;background:#6366f1"></div>
+                    <div class="bar" style="height:28%;background:#10b981"></div>
+                    <div class="bar" style="height:16%;background:#3b82f6"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:58%;background:#6366f1"></div>
+                    <div class="bar" style="height:40%;background:#10b981"></div>
+                    <div class="bar" style="height:24%;background:#3b82f6"></div>
+                  </div>
+                </div>
+                <div class="x-axis-labels">
+                  <span>10-1</span>
+                  <span>10-31</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    // Model tab switching
+    document.querySelectorAll('.model-tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        const target = this.dataset.modelTab;
+        document.querySelectorAll('.model-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.model-tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('model-tab-' + target).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

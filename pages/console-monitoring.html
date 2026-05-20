@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>监控与日志 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    /* Stats row */
+    .monitor-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .monitor-stats .stat-item { gap: 6px; }
+    .monitor-stats .stat-label { font-size: 12px; color: var(--text-muted); }
+    .monitor-stats .stat-value { font-size: 22px; font-weight: 600; }
+
+    /* QPS limit section */
+    .qps-section { margin-bottom: 32px; }
+    .qps-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .qps-title { font-size: 14px; color: var(--text-secondary); }
+    .qps-value { font-size: 13px; color: var(--text-muted); }
+
+    /* Log table */
+    .log-section { margin-bottom: 32px; }
+    .log-section .section-title { margin-bottom: 16px; }
+    .log-table th, .log-table td { padding: 12px 14px; font-size: 13px; }
+    .log-table .log-time { color: var(--text-muted); font-family: "SF Mono", Monaco, monospace; font-size: 12px; }
+    .log-table .log-level {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .log-level.info { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+    .log-level.warn { background: rgba(245,158,11,0.15); color: var(--accent-yellow); }
+    .log-level.error { background: rgba(239,68,68,0.15); color: var(--accent-red); }
+    .log-table .log-msg { color: var(--text-secondary); }
+
+    /* Chart row */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .chart-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .chart-box-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+    .chart-box .legend { margin-bottom: 12px; }
+
+    .chart-legend-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .chart-legend-row .legend { flex-direction: column; gap: 8px; }
+
+    .line-chart-area { height: 140px; }
+
+    .bar-chart-placeholder {
+      height: 120px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 0 4px;
+    }
+    .bar-group {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 2px;
+      height: 100%;
+    }
+    .bar { width: 6px; border-radius: 2px 2px 0 0; }
+
+    .chart-with-axis {
+      display: flex;
+      gap: 8px;
+    }
+    .y-axis {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      padding: 4px 0;
+      text-align: right;
+      min-width: 50px;
+    }
+    .chart-area { flex: 1; }
+    .x-axis-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 8px;
+      padding: 0 4px;
+    }
+  </style>
+</head>
+<body data-page="console-monitoring">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area">
+        <h1 class="page-title">监控与日志</h1>
+
+        <!-- 实时监控统计 -->
+        <div class="monitor-stats">
+          <div class="stat-item">
+            <div class="stat-label">QPS峰值</div>
+            <div class="stat-value">5,775</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">平均响应时间</div>
+            <div class="stat-value">120ms</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">成功率</div>
+            <div class="stat-value">99.8%</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">1周调用量</div>
+            <div class="stat-value">35,190</div>
+          </div>
+        </div>
+
+        <!-- 设置QPS上限 -->
+        <div class="qps-section">
+          <div class="qps-header">
+            <div>
+              <div class="qps-title">设置QPS上限</div>
+              <div class="qps-value">当前QPS上限：1000</div>
+            </div>
+          </div>
+          <div class="option-group">
+            <button class="option-btn">500</button>
+            <button class="option-btn active">1000</button>
+            <button class="option-btn">2000</button>
+            <button class="option-btn">5000</button>
+            <button class="option-btn">10000</button>
+            <button class="option-btn">自定义</button>
+          </div>
+        </div>
+
+        <!-- 存储日志 -->
+        <div class="log-section">
+          <h2 class="section-title">存储日志</h2>
+          <table class="data-table log-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>级别</th>
+                <th>操作</th>
+                <th>详情</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="log-time">2025-05-20 14:32:15</td>
+                <td><span class="log-level info">INFO</span></td>
+                <td>上传文件</td>
+                <td class="log-msg">用户上传文件 data_2025.csv 至标准存储，大小 256MB</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-20 13:18:42</td>
+                <td><span class="log-level info">INFO</span></td>
+                <td>数据取回</td>
+                <td class="log-msg">取回数据 report_may.pdf，大小 12MB</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-20 11:05:33</td>
+                <td><span class="log-level warn">WARN</span></td>
+                <td>存储告警</td>
+                <td class="log-msg">标准存储空间使用率已达 85%</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-20 09:45:10</td>
+                <td><span class="log-level info">INFO</span></td>
+                <td>存证操作</td>
+                <td class="log-msg">数据存证提交成功，证书编号 CERT-20250520-001</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-19 22:10:55</td>
+                <td><span class="log-level error">ERROR</span></td>
+                <td>上传失败</td>
+                <td class="log-msg">文件 backup.tar.gz 上传失败，网络超时</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <span>共 48 条</span>
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+
+        <!-- 模型调用日志 -->
+        <div class="log-section">
+          <h2 class="section-title">模型调用日志</h2>
+          <table class="data-table log-table">
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>模型</th>
+                <th>状态</th>
+                <th>响应时间</th>
+                <th>Token消耗</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="log-time">2025-05-20 14:35:02</td>
+                <td>gemma3:7b</td>
+                <td><span class="status-text"><span class="status-dot running"></span>成功</span></td>
+                <td class="cell-muted">98ms</td>
+                <td class="cell-muted">1,245</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-20 14:34:58</td>
+                <td>Minimax-m2</td>
+                <td><span class="status-text"><span class="status-dot running"></span>成功</span></td>
+                <td class="cell-muted">156ms</td>
+                <td class="cell-muted">2,890</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-20 14:34:55</td>
+                <td>gemma3:7b</td>
+                <td><span class="status-text"><span class="status-dot error"></span>失败</span></td>
+                <td class="cell-muted">—</td>
+                <td class="cell-muted">0</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-20 14:34:50</td>
+                <td>Deepseek-3.1</td>
+                <td><span class="status-text"><span class="status-dot running"></span>成功</span></td>
+                <td class="cell-muted">210ms</td>
+                <td class="cell-muted">4,120</td>
+              </tr>
+              <tr>
+                <td class="log-time">2025-05-20 14:34:45</td>
+                <td>gpt-oss:120b</td>
+                <td><span class="status-text"><span class="status-dot running"></span>成功</span></td>
+                <td class="cell-muted">320ms</td>
+                <td class="cell-muted">5,670</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <span>共 1,240 条</span>
+            <button class="page-btn">‹</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">...</button>
+            <button class="page-btn">125</button>
+            <button class="page-btn">›</button>
+          </div>
+        </div>
+
+        <!-- 图表区域 -->
+        <div class="section">
+          <h2 class="section-title">调用分析</h2>
+          <div class="chart-row">
+            <!-- 模型调用分布 -->
+            <div class="chart-box">
+              <div class="chart-box-title">模型调用分布</div>
+              <div class="chart-legend-row">
+                <div class="legend">
+                  <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>gemma3:7b</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Minimax-m2</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Deepseek-3.1</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>gpt-oss</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Others</div>
+                </div>
+                <div class="pie-placeholder"></div>
+              </div>
+            </div>
+
+            <!-- 平均响应时间趋势 -->
+            <div class="chart-box">
+              <div class="chart-box-title">平均响应时间趋势</div>
+              <div class="line-chart-area">
+                <svg width="100%" height="100%" viewBox="0 0 400 140" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="lineGrad3" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,60 Q30,70 60,55 T120,65 T180,50 T240,60 T300,45 T360,55 T400,40" fill="none" stroke="#3b82f6" stroke-width="2"/>
+                  <path d="M0,60 Q30,70 60,55 T120,65 T180,50 T240,60 T300,45 T360,55 T400,40 L400,140 L0,140 Z" fill="url(#lineGrad3)"/>
+                </svg>
+              </div>
+              <div class="x-axis-labels" style="margin-top:8px;">
+                <span>5/14</span>
+                <span>5/20</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Token使用情况 -->
+          <div class="chart-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <div class="chart-box-title" style="margin-bottom:0;">Token使用情况</div>
+              <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>输入Token</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>输出Token</div>
+              </div>
+            </div>
+            <div class="chart-with-axis">
+              <div class="y-axis">
+                <span>800K</span>
+                <span>0</span>
+              </div>
+              <div class="chart-area">
+                <div class="bar-chart-placeholder">
+                  <div class="bar-group">
+                    <div class="bar" style="height:40%;background:#6366f1"></div>
+                    <div class="bar" style="height:25%;background:#10b981"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:55%;background:#6366f1"></div>
+                    <div class="bar" style="height:35%;background:#10b981"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:30%;background:#6366f1"></div>
+                    <div class="bar" style="height:20%;background:#10b981"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:48%;background:#6366f1"></div>
+                    <div class="bar" style="height:30%;background:#10b981"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:35%;background:#6366f1"></div>
+                    <div class="bar" style="height:22%;background:#10b981"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:42%;background:#6366f1"></div>
+                    <div class="bar" style="height:28%;background:#10b981"></div>
+                  </div>
+                  <div class="bar-group">
+                    <div class="bar" style="height:50%;background:#6366f1"></div>
+                    <div class="bar" style="height:32%;background:#10b981"></div>
+                  </div>
+                </div>
+                <div class="x-axis-labels">
+                  <span>5/14</span>
+                  <span>5/20</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    // Option buttons
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.parentElement.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

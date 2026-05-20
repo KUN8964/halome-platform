@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据存储管理 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .storage-page .section { margin-bottom: 32px; }
+    .storage-page .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .storage-page .section-title { font-size: 22px; font-weight: 600; }
+    .storage-page .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 20px; }
+    .storage-page .stat-box { display: flex; flex-direction: column; gap: 8px; }
+    .storage-page .stat-label { font-size: 12px; color: var(--text-muted); }
+    .storage-page .stat-value { font-size: 24px; font-weight: 600; }
+    .storage-page .stat-sub { font-size: 11px; color: var(--text-tertiary); }
+    .storage-page .chart-area {
+      background: var(--bg-card); border: 1px solid var(--border-secondary); border-radius: var(--radius-lg);
+      padding: 20px; height: 180px; margin-top: 16px;
+      display: flex; align-items: flex-end; justify-content: space-between; position: relative;
+    }
+    .storage-page .chart-line {
+      position: absolute; bottom: 40px; left: 40px; right: 40px; top: 40px;
+    }
+    .storage-page .chart-svg { width: 100%; height: 100%; }
+    .storage-page .balance-bar {
+      background: var(--bg-card); border: 1px solid var(--border-secondary); border-radius: var(--radius-lg);
+      padding: 24px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .storage-page .balance-info { display: flex; flex-direction: column; gap: 6px; }
+    .storage-page .balance-label { font-size: 12px; color: var(--text-muted); }
+    .storage-page .balance-value { font-size: 28px; color: var(--accent-purple-light); font-weight: 600; }
+    .storage-page .balance-side { text-align: right; }
+    .storage-page .balance-side-item { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+  </style>
+</head>
+<body data-page="console-storage">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area storage-page">
+        <div class="page-title">数据管理</div>
+
+        <!-- 标准存储 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">标准存储</div>
+            <button class="btn btn-sm btn-primary">立即购买</button>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-label">存储容量统计</div>
+              <div class="stat-value">539.1 M/100G</div>
+              <div class="stat-sub">到期时间:2027年5月20日</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">七日上传量统计</div>
+              <div class="stat-value">539.1 M</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">读取次数</div>
+              <div class="stat-value">3767</div>
+            </div>
+          </div>
+          <div class="stat-label" style="margin-bottom:8px;">存储趋势统计</div>
+          <div class="chart-area">
+            <svg class="chart-svg" viewBox="0 0 400 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.3" />
+                  <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,80 Q30,60 60,70 T120,50 T180,65 T240,40 T300,55 T360,35 T400,45 L400,120 L0,120 Z" fill="url(#grad1)" />
+              <path d="M0,80 Q30,60 60,70 T120,50 T180,65 T240,40 T300,55 T360,35 T400,45" fill="none" stroke="#8b5cf6" stroke-width="2" />
+            </svg>
+            <div style="position:absolute;bottom:8px;left:16px;font-size:11px;color:var(--text-muted);">¥0</div>
+            <div style="position:absolute;bottom:8px;right:16px;font-size:11px;color:var(--text-muted);">10-31</div>
+            <div style="position:absolute;top:8px;left:16px;font-size:11px;color:var(--text-muted);">¥1500</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 数据取回 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">数据取回</div>
+            <button class="btn btn-sm btn-primary">立即购买</button>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-label">取回容量统计</div>
+              <div class="stat-value">239.1 M/100G</div>
+              <div class="stat-sub">到期时间:2027年5月20日</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">七日取回量统计</div>
+              <div class="stat-value">44.8 M</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">读取次数</div>
+              <div class="stat-value">2213</div>
+            </div>
+          </div>
+          <div class="stat-label" style="margin-bottom:8px;">存储趋势统计</div>
+          <div class="chart-area">
+            <svg class="chart-svg" viewBox="0 0 400 120" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="grad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.3" />
+                  <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,90 Q40,70 80,75 T160,55 T240,60 T320,45 T400,50 L400,120 L0,120 Z" fill="url(#grad2)" />
+              <path d="M0,90 Q40,70 80,75 T160,55 T240,60 T320,45 T400,50" fill="none" stroke="#a78bfa" stroke-width="2" />
+            </svg>
+            <div style="position:absolute;bottom:8px;left:16px;font-size:11px;color:var(--text-muted);">0 MB</div>
+            <div style="position:absolute;bottom:8px;right:16px;font-size:11px;color:var(--text-muted);">10-31</div>
+            <div style="position:absolute;top:8px;left:16px;font-size:11px;color:var(--text-muted);">300 MB</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 存证管理 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">存证管理</div>
+            <button class="btn btn-sm btn-primary">立即充值</button>
+          </div>
+          <div class="balance-bar">
+            <div class="balance-info">
+              <div class="balance-label">当前账户余额</div>
+              <div class="balance-value">¥ 2,000.00</div>
+            </div>
+            <div class="balance-side">
+              <div class="balance-side-item">本月已消费：¥159.88</div>
+              <div class="balance-side-item">累计已消费：¥159.88</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 数据存证 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">数据存证</div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-label">存证条数统计</div>
+              <div class="stat-value">12.6M</div>
+              <div class="stat-sub">单价:0.03元/条</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">七日存证量统计</div>
+              <div class="stat-value">0.8 M</div>
+              <div class="stat-sub">本月消费:¥200.00</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">出证次数</div>
+              <div class="stat-value">210</div>
+              <div class="stat-sub">免费</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 实时出证 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">实时出证</div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-label">累计出证份数</div>
+              <div class="stat-value">895 份</div>
+              <div class="stat-sub">单价:2元/份</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">七日存证量统计</div>
+              <div class="stat-value">57 份</div>
+              <div class="stat-sub">本月消费:¥200.00</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">下载次数</div>
+              <div class="stat-value">210</div>
+              <div class="stat-sub">免费</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 正式公证书 -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">正式公证书</div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-box">
+              <div class="stat-label">累计公证书份数</div>
+              <div class="stat-value">14 份</div>
+              <div class="stat-sub">单价:1200元/份</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">七日存证量统计</div>
+              <div class="stat-value">0 份</div>
+              <div class="stat-sub">本月消费:¥00.00</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-label">核验次数</div>
+              <div class="stat-value">32</div>
+              <div class="stat-sub">免费</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="../js/sidebar.js"></script>
+</body>
+</html>

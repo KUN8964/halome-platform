@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公告中心 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .announce-page .page-title { margin-bottom: 8px; }
+    .announce-page .page-subtitle { margin-bottom: 32px; }
+
+    /* Stats row */
+    .announce-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .announce-stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .announce-stat-card .stat-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .announce-stat-card .stat-value { font-size: 28px; font-weight: 600; }
+
+    /* Filter bar */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-bar .filter-input {
+      padding: 7px 12px;
+      font-size: 13px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-md);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      outline: none;
+    }
+    .filter-bar .filter-input:focus { border-color: var(--accent-purple); }
+    .filter-bar .filter-select {
+      padding: 7px 12px;
+      font-size: 13px;
+      border: 1px solid var(--border-input);
+      border-radius: var(--radius-md);
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      outline: none;
+      cursor: pointer;
+    }
+    .mark-all-btn {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--text-link);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .mark-all-btn:hover { text-decoration: underline; }
+
+    /* Message list */
+    .message-list { margin-bottom: 24px; }
+    .message-item {
+      display: grid;
+      grid-template-columns: 8px 1fr auto;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border-secondary);
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .message-item:hover { background: var(--bg-hover); margin: 0 -16px; padding: 18px 16px; border-radius: var(--radius-md); }
+    .message-item:last-child { border-bottom: none; }
+
+    .msg-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      margin-top: 6px;
+    }
+    .msg-dot.read { background: var(--text-tertiary); opacity: 0.3; }
+
+    .msg-content .msg-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .msg-content .msg-title.read { font-weight: 400; color: var(--text-secondary); }
+    .msg-content .msg-body {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .msg-content .msg-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 11px;
+      border-radius: var(--radius-sm);
+      margin-right: 8px;
+      margin-top: 8px;
+    }
+    .msg-tag.system { background: rgba(139, 92, 246, 0.1); color: var(--accent-purple-light); }
+    .msg-tag.billing { background: rgba(245, 158, 11, 0.1); color: var(--accent-yellow); }
+    .msg-tag.service { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); }
+    .msg-tag.security { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); }
+
+    .msg-time {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body data-page="account-announcements">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area announce-page">
+        <h1 class="page-title">公告中心</h1>
+        <p class="page-subtitle">平台通知与消息公告</p>
+
+        <!-- 统计 -->
+        <div class="announce-stats">
+          <div class="announce-stat-card">
+            <div class="stat-label">全部消息</div>
+            <div class="stat-value">28</div>
+          </div>
+          <div class="announce-stat-card">
+            <div class="stat-label">未读消息</div>
+            <div class="stat-value" style="color:var(--accent-blue);">5</div>
+          </div>
+          <div class="announce-stat-card">
+            <div class="stat-label">已读消息</div>
+            <div class="stat-value">23</div>
+          </div>
+        </div>
+
+        <!-- 筛选栏 -->
+        <div class="filter-bar">
+          <select class="filter-select">
+            <option>全部时间</option>
+            <option>今天</option>
+            <option>最近7天</option>
+            <option>最近30天</option>
+          </select>
+          <select class="filter-select">
+            <option>全部类型</option>
+            <option>系统通知</option>
+            <option>账单通知</option>
+            <option>服务通知</option>
+            <option>安全通知</option>
+          </select>
+          <input class="filter-input" placeholder="搜索消息..." style="width:200px;">
+          <button class="mark-all-btn">全部标记为已读</button>
+        </div>
+
+        <!-- 消息列表 -->
+        <div class="message-list">
+          <div class="message-item">
+            <div class="msg-dot"></div>
+            <div class="msg-content">
+              <div class="msg-title">系统维护通知：5月22日凌晨2:00-4:00进行系统升级</div>
+              <div class="msg-body">尊敬的用户，为提升服务质量和稳定性，我们将于2025年5月22日凌晨2:00-4:00进行系统升级维护，届时部分服务可能短暂不可用，请提前做好安排。</div>
+              <span class="msg-tag system">系统通知</span>
+            </div>
+            <div class="msg-time">10分钟前</div>
+          </div>
+
+          <div class="message-item">
+            <div class="msg-dot"></div>
+            <div class="msg-content">
+              <div class="msg-title">账单提醒：5月账单已生成</div>
+              <div class="msg-body">您的5月份账单已生成，本月消费金额 ¥1,355.69，请及时查看并确认。</div>
+              <span class="msg-tag billing">账单通知</span>
+            </div>
+            <div class="msg-time">2小时前</div>
+          </div>
+
+          <div class="message-item">
+            <div class="msg-dot"></div>
+            <div class="msg-content">
+              <div class="msg-title">新模型上线：DeepSeek-V3 现已可用</div>
+              <div class="msg-body">DeepSeek-V3 模型已上线光宇开放平台，支持长文本推理和代码生成，欢迎体验。</div>
+              <span class="msg-tag service">服务通知</span>
+            </div>
+            <div class="msg-time">昨天</div>
+          </div>
+
+          <div class="message-item">
+            <div class="msg-dot"></div>
+            <div class="msg-content">
+              <div class="msg-title">安全提醒：检测到新设备登录</div>
+              <div class="msg-body">检测到您的账号在新设备（Windows - Chrome）上登录，IP地址 192.168.1.xxx。如非本人操作请立即修改密码。</div>
+              <span class="msg-tag security">安全通知</span>
+            </div>
+            <div class="msg-time">昨天</div>
+          </div>
+
+          <div class="message-item">
+            <div class="msg-dot"></div>
+            <div class="msg-content">
+              <div class="msg-title">存储空间使用率提醒</div>
+              <div class="msg-body">您的标准存储空间使用率已达 85%，建议及时扩容或清理无用数据。</div>
+              <span class="msg-tag service">服务通知</span>
+            </div>
+            <div class="msg-time">3天前</div>
+          </div>
+
+          <div class="message-item">
+            <div class="msg-dot read"></div>
+            <div class="msg-content">
+              <div class="msg-title read">API文档更新通知</div>
+              <div class="msg-body">云存储API v3.2版本已发布，新增批量操作接口和断点续传功能，详见API文档。</div>
+              <span class="msg-tag system">系统通知</span>
+            </div>
+            <div class="msg-time">5天前</div>
+          </div>
+
+          <div class="message-item">
+            <div class="msg-dot read"></div>
+            <div class="msg-content">
+              <div class="msg-title read">4月账单已支付</div>
+              <div class="msg-body">您的4月份账单 ¥899.00 已自动扣款成功，感谢使用光宇开放平台。</div>
+              <span class="msg-tag billing">账单通知</span>
+            </div>
+            <div class="msg-time">5月1日</div>
+          </div>
+
+          <div class="message-item">
+            <div class="msg-dot read"></div>
+            <div class="msg-content">
+              <div class="msg-title read">企业认证审核通过</div>
+              <div class="msg-body">恭喜，您的企业认证已通过审核，现已解锁全部平台功能。</div>
+              <span class="msg-tag system">系统通知</span>
+            </div>
+            <div class="msg-time">4月28日</div>
+          </div>
+        </div>
+
+        <div class="pagination">
+          <span>共 28 条</span>
+          <button class="page-btn">‹</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">›</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+</body>
+</html>

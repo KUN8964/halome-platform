@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>仪表盘 - HALOME 光宇开放平台</title>
+  <link rel="stylesheet" href="../css/theme.css">
+  <style>
+    .dashboard-page .tabs { border-bottom: none; }
+    .dashboard-page .tab { padding: 10px 24px; font-size: 15px; }
+    .dashboard-page .info-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-secondary);
+      margin-bottom: 24px;
+    }
+    .dashboard-page .info-bar .info-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .dashboard-page .info-bar .info-value { font-size: 15px; color: var(--text-primary); font-weight: 500; }
+    .dashboard-page .info-bar .info-action { justify-self: end; }
+
+    .usage-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .usage-item .usage-title { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .usage-item .usage-value { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+    .usage-item .usage-date { font-size: 12px; color: var(--text-muted); }
+
+    .space-list { margin-top: 24px; }
+    .space-list-header {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 16px;
+      padding: 12px 0;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .space-list-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border-secondary);
+    }
+    .space-list-row .space-name { color: var(--text-primary); font-weight: 500; }
+    .space-list-row .space-type { color: var(--text-secondary); }
+    .space-list-row .space-status { display: flex; align-items: center; gap: 6px; }
+    .space-list-row .space-action { color: var(--text-link); cursor: pointer; }
+
+    .enterprise-code-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-secondary);
+    }
+    .enterprise-code-section .ec-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+      align-items: center;
+    }
+    .enterprise-code-section .ec-label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+    .enterprise-code-section .ec-value { font-size: 20px; font-weight: 600; font-family: monospace; }
+    .enterprise-code-section .ec-actions { display: flex; gap: 16px; }
+    .enterprise-code-section .ec-actions a { color: var(--text-link); font-size: 13px; cursor: pointer; }
+
+    .empty-state-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+      gap: 16px;
+    }
+    .empty-state-box .empty-title { font-size: 14px; color: var(--text-secondary); }
+    .empty-state-box .empty-desc { font-size: 13px; color: var(--text-muted); }
+
+    .ai-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    .ai-chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .chart-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-secondary);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+    .chart-box-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; }
+
+    .modal.show { display: flex; }
+    .modal { display: none; }
+    .form-group-inline { display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .form-group-inline .form-label { margin-bottom: 0; text-align: right; color: var(--text-link); }
+    .upload-box {
+      border: 1px dashed var(--border-primary);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      text-align: center;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .upload-box:hover { border-color: var(--accent-purple); }
+    .code-inputs { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
+    .code-inputs input {
+      width: 44px; height: 52px; text-align: center; font-size: 20px;
+      border: 1px solid var(--border-input); border-radius: var(--radius-md);
+      background: var(--bg-input); color: var(--text-primary); outline: none;
+    }
+    .code-inputs input:focus { border-color: var(--accent-purple); }
+    .apikey-box {
+      background: var(--bg-input); padding: 14px 20px; border-radius: var(--radius-md);
+      font-family: monospace; font-size: 14px; color: var(--accent-purple-light);
+      margin: 16px 0; word-break: break-all;
+    }
+    .timer-text { font-size: 12px; color: var(--text-muted); text-align: center; margin: 8px 0; }
+    .timer-text span { color: var(--text-link); cursor: pointer; }
+
+    .modal-footer-btn { display: flex; justify-content: center; margin-top: 24px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .sn-input {
+      width: 100%; padding: 12px 16px; font-size: 14px; font-family: monospace;
+      border: 1px solid var(--border-input); border-radius: var(--radius-md);
+      background: var(--bg-input); color: var(--accent-purple-light); outline: none;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body data-page="console-dashboard">
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="main-wrapper">
+      <header class="top-header">
+        <div class="header-actions">
+          <button class="header-btn" title="用户">👤</button>
+          <button class="header-btn" title="退出">↪</button>
+        </div>
+      </header>
+      <main class="content-area dashboard-page">
+        <div class="tabs">
+          <button class="tab active" data-tab="cloud">云存储空间</button>
+          <button class="tab" data-tab="ai">AI模型空间</button>
+          <button class="tab" data-tab="disk">企业云盘</button>
+        </div>
+
+        <!-- 云存储空间 Tab -->
+        <div class="tab-content active" id="tab-cloud">
+          <div class="info-bar">
+            <div>
+              <div class="info-label">用户名</div>
+              <div class="info-value">杭州七七八八久久有限公司</div>
+            </div>
+            <div>
+              <div class="info-label">登录账号</div>
+              <div class="info-value">137 0000 1111</div>
+            </div>
+            <div>
+              <div class="info-label">余额</div>
+              <div class="info-value">¥ 1,000.00 元</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div>
+                <div class="info-label">抵扣券</div>
+                <div class="info-value">¥ 500.00 元</div>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="showModal('modal-exchange')">兑换抵扣券</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="usage-grid">
+              <div class="usage-item">
+                <div class="usage-title">已使用存储</div>
+                <div class="usage-value">539.1 M/100G</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:5%"></div></div>
+                <div class="usage-date">有效期至</div>
+                <div style="font-size:20px;font-weight:600;margin-top:4px;">2025年12月31日</div>
+              </div>
+              <div class="usage-item">
+                <div class="usage-title">已使用数据取回</div>
+                <div class="usage-value">123.3 M/100G</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:1%"></div></div>
+                <div class="usage-date">有效期至</div>
+                <div style="font-size:20px;font-weight:600;margin-top:4px;">2025年12月31日</div>
+              </div>
+            </div>
+
+            <div class="space-list">
+              <div class="space-list-header">
+                <div>空间名称</div>
+                <div>存储类型</div>
+                <div>状态</div>
+                <div>API Key</div>
+              </div>
+              <div class="space-list-row">
+                <div class="space-name">测试空间</div>
+                <div class="space-type">标准存储</div>
+                <div class="space-status"><span class="status-dot running"></span>使用中</div>
+                <div class="space-action" onclick="showModal('modal-apikey-verify')">查看</div>
+              </div>
+            </div>
+
+            <div class="enterprise-code-section">
+              <div class="ec-grid">
+                <div>
+                  <div class="ec-label">企业码</div>
+                  <div class="ec-value">QSCG</div>
+                </div>
+                <div class="ec-actions">
+                  <a>扩容空间</a>
+                  <a>修改名称</a>
+                  <a>关闭空间</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn btn-sm" onclick="showModal('modal-auth-org')">机构认证弹窗</button>
+            <button class="btn btn-sm" onclick="showModal('modal-auth-enterprise')">企业认证弹窗</button>
+            <button class="btn btn-sm" onclick="showModal('modal-create-space')">创建云空间弹窗</button>
+          </div>
+        </div>
+
+        <!-- AI模型空间 Tab -->
+        <div class="tab-content" id="tab-ai">
+          <div class="info-bar">
+            <div>
+              <div class="info-label">用户名</div>
+              <div class="info-value">杭州七七八八久久有限公司</div>
+            </div>
+            <div>
+              <div class="info-label">登录账号</div>
+              <div class="info-value">137 0000 1111</div>
+            </div>
+            <div>
+              <div class="info-label">余额</div>
+              <div class="info-value">¥ 1,000.00 元</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div>
+                <div class="info-label">抵扣券</div>
+                <div class="info-value">¥ 500.00 元</div>
+              </div>
+              <button class="btn btn-sm btn-primary" onclick="showModal('modal-exchange')">兑换抵扣券</button>
+            </div>
+          </div>
+
+          <div class="ai-stats-grid">
+            <div class="stat-item">
+              <div class="stat-label">已部署AI模型</div>
+              <div class="stat-value">3/5</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">正在运行数</div>
+              <div class="stat-value">1</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">异常模型</div>
+              <div class="stat-value">1 <span style="font-size:13px;color:var(--text-link);cursor:pointer;">查看</span></div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">模型收入</div>
+              <div class="stat-value">4,536.99</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-bottom:24px;">
+            <div class="stat-item">
+              <div class="stat-label">本周总调用数</div>
+              <div class="stat-value small">35,190 次</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">调用最多模型</div>
+              <div class="stat-value small">Model-X</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">QPS峰值</div>
+              <div class="stat-value small">5,775</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">模型收入</div>
+              <div class="stat-value small">4,536.99</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-title" style="margin-bottom:16px;">调用分布</div>
+            <div style="display:flex;align-items:center;gap:32px;">
+              <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#06b6d4"></div>Labels</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>Labels</div>
+              </div>
+              <div class="pie-placeholder"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 企业云盘 Tab -->
+        <div class="tab-content" id="tab-disk">
+          <div class="info-bar">
+            <div>
+              <div class="info-label">用户名</div>
+              <div class="info-value">杭州七七八八久久有限公司</div>
+            </div>
+            <div>
+              <div class="info-label">登录账号</div>
+              <div class="info-value">137 0000 1111</div>
+            </div>
+            <div>
+              <div class="info-label">企业码</div>
+              <div class="info-value">QSCG</div>
+            </div>
+            <div>
+              <div class="info-label">云盘空间</div>
+              <div class="info-value">0 GB/0 GB</div>
+              <div class="usage-date">到期时间:2027年5月20日</div>
+            </div>
+          </div>
+
+          <div class="card" style="text-align:center;padding:60px 20px;">
+            <div class="empty-state-box" style="padding:0;">
+              <div class="empty-title">您还没有创建企业云盘</div>
+              <div class="empty-desc">光宇云存储提供安全、高效、弹性的存储服务，随时随地访问您的数据</div>
+              <button class="btn btn-primary btn-lg" style="margin-top:16px;">立即开通</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 兑换抵扣券 Modal -->
+  <div class="modal-overlay modal" id="modal-exchange">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <div></div>
+        <div class="modal-title">兑换抵扣券</div>
+        <button class="modal-close" onclick="closeModal('modal-exchange')">✕</button>
+      </div>
+      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+        请将机器 SN码 输入下方对话框中。
+      </div>
+      <input type="text" class="sn-input" value="sn-7e3c0Fce9d8c049b587557677eb105b85">
+      <div class="modal-footer-btn">
+        <button class="btn btn-primary">兑换</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key 安全验证 Modal -->
+  <div class="modal-overlay modal" id="modal-apikey-verify">
+    <div class="modal" style="min-width:440px;">
+      <div class="modal-header">
+        <div></div>
+        <div class="modal-title">查看API Key</div>
+        <button class="modal-close" onclick="closeModal('modal-apikey-verify')">✕</button>
+      </div>
+      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:20px;line-height:1.6;">
+        查看API Key需要进行安全验证，验证码已发送到<br>137 0000 1234 手机号中
+      </div>
+      <div class="code-inputs">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+        <input type="text" maxlength="1">
+      </div>
+      <div class="timer-text">59s后重新发送 <span>重新发送</span></div>
+      <div class="modal-footer-btn">
+        <button class="btn btn-primary" onclick="closeModal('modal-apikey-verify');showModal('modal-apikey-show')">验证</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- API Key 展示 Modal -->
+  <div class="modal-overlay modal" id="modal-apikey-show">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <div></div>
+        <div class="modal-title">创建云空间</div>
+        <button class="modal-close" onclick="closeModal('modal-apikey-show')">✕</button>
+      </div>
+      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+        请将此 API key 保存在安全且易于手动输入的地方。
+      </div>
+      <div class="apikey-box">sk-7e3c0Fce9d8c049b587557677eb105b85</div>
+      <div class="modal-footer-btn">
+        <button class="btn btn-primary">复制</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 机构认证 Modal -->
+  <div class="modal-overlay modal" id="modal-auth-org">
+    <div class="modal" style="min-width:520px;">
+      <div class="modal-header">
+        <div></div>
+        <div class="modal-title">企业认证</div>
+        <button class="modal-close" onclick="closeModal('modal-auth-org')">✕</button>
+      </div>
+      <div style="text-align:center;margin-bottom:24px;">
+        <button class="option-btn active" style="margin-right:8px;">机构</button>
+        <button class="option-btn">机构</button>
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">机构名称</div>
+        <input class="form-input" placeholder="请填写组织机构代码证上的名称">
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">机构代码</div>
+        <input class="form-input" placeholder='请填写"xxxxxxxx-x"格式的组织机构代码'>
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">邮箱地址</div>
+        <input class="form-input" placeholder="请输入您的邮箱">
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">组织证件</div>
+        <div class="upload-box" style="flex:1;">
+          <div style="font-size:28px;margin-bottom:8px;">☁</div>
+          <div>请上传大小不超过5M的图片，支持.jpg.jpeg.pdf.gif.png格式</div>
+        </div>
+      </div>
+      <div class="modal-footer-btn">
+        <button class="btn btn-primary">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 企业认证 Modal -->
+  <div class="modal-overlay modal" id="modal-auth-enterprise">
+    <div class="modal" style="min-width:520px;">
+      <div class="modal-header">
+        <div></div>
+        <div class="modal-title">企业认证</div>
+        <button class="modal-close" onclick="closeModal('modal-auth-enterprise')">✕</button>
+      </div>
+      <div style="text-align:center;margin-bottom:24px;">
+        <button class="option-btn" style="margin-right:8px;">企业</button>
+        <button class="option-btn active">机构</button>
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">企业名称</div>
+        <input class="form-input" placeholder="请填写营业执照上的企业名称">
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">社会信用代码</div>
+        <input class="form-input" placeholder="请填写15位统一社会信用代码">
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">邮箱地址</div>
+        <input class="form-input" placeholder="请输入您的邮箱">
+      </div>
+      <div class="form-group-inline">
+        <div class="form-label">营业执照</div>
+        <div class="upload-box" style="flex:1;">
+          <div style="font-size:28px;margin-bottom:8px;">☁</div>
+          <div>请上传大小不超过5M的图片，支持.jpg.jpeg.pdf.gif.png格式</div>
+        </div>
+      </div>
+      <div class="modal-footer-btn">
+        <button class="btn btn-primary">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 创建云空间 Modal -->
+  <div class="modal-overlay modal" id="modal-create-space">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <div></div>
+        <div class="modal-title">创建云空间</div>
+        <button class="modal-close" onclick="closeModal('modal-create-space')">✕</button>
+      </div>
+      <div style="text-align:center;color:var(--text-muted);font-size:13px;margin-bottom:16px;">
+        请将此 API key 保存在安全且易于手动输入的地方。
+      </div>
+      <div class="apikey-box">sk-7e3c0Fce9d8c049b587557677eb105b85</div>
+      <div class="modal-footer-btn">
+        <button class="btn btn-primary">复制</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', function() {
+        const target = this.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        document.getElementById('tab-' + target).classList.add('active');
+      });
+    });
+
+    function showModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('show');
+      });
+    });
+
+    // Code input auto-focus
+    document.querySelectorAll('.code-inputs input').forEach((input, index, inputs) => {
+      input.addEventListener('input', function() {
+        if (this.value && index < inputs.length - 1) inputs[index + 1].focus();
+      });
+    });
+  </script>
+</body>
+</html>
