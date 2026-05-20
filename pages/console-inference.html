@@ -358,6 +358,8 @@
         this.classList.add('active');
       });
     });
+    // 立即充值按钮
+    document.querySelector('.btn-primary').addEventListener('click', () => openModal('modal-recharge'));
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
@@ -368,6 +370,10 @@
       closeModal('modal-qps');
       showToast('QPS 限制已设置为 ' + v, 'success');
     }
+    // 充值逻辑
+    let rAmount = 500;
+    function selectROption(el, amt) { document.querySelectorAll('.recharge-option').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); rAmount = amt; }
+    function confirmRecharge() { closeModal('modal-recharge'); showToast('充值成功！已到账 ¥' + rAmount, 'success'); }
     function showToast(m, t) {
       const c = document.getElementById('toast-container'), d = document.createElement('div');
       d.className = 'toast ' + (t||'info');
@@ -396,6 +402,36 @@
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('modal-qps')">取消</button>
         <button class="btn btn-primary" onclick="confirmQPS()">确认设置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 充值弹窗 -->
+  <div class="modal-overlay" id="modal-recharge" style="display:none;">
+    <div class="modal" style="min-width:440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">账户充值</h3>
+        <button class="modal-close" onclick="closeModal('modal-recharge')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">当前余额：<span style="color:var(--accent-purple-light);font-weight:600;">¥ 355.69</span></label>
+        </div>
+        <div class="form-group">
+          <label class="form-label">选择充值金额</label>
+          <div class="recharge-options">
+            <div class="recharge-option" onclick="selectROption(this,100)"><div class="r-price">¥ 100</div></div>
+            <div class="recharge-option" onclick="selectROption(this,200)"><div class="r-price">¥ 200</div></div>
+            <div class="recharge-option selected" onclick="selectROption(this,500)"><div class="r-price">¥ 500</div><div class="r-desc">赠送 ¥50</div></div>
+            <div class="recharge-option" onclick="selectROption(this,1000)"><div class="r-price">¥ 1,000</div><div class="r-desc">赠送 ¥150</div></div>
+            <div class="recharge-option" onclick="selectROption(this,2000)"><div class="r-price">¥ 2,000</div><div class="r-desc">赠送 ¥400</div></div>
+            <div class="recharge-option" onclick="selectROption(this,5000)"><div class="r-price">¥ 5,000</div><div class="r-desc">赠送 ¥1200</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-recharge')">取消</button>
+        <button class="btn btn-primary" onclick="confirmRecharge()">确认充值</button>
       </div>
     </div>
   </div>

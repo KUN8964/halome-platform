@@ -1110,3 +1110,31 @@ a.nav-item {
   transition: opacity var(--transition-fast);
 }
 .copy-feedback.show { opacity: 1; }
+
+/* ============================================
+   Recharge Options (for modals)
+   ============================================ */
+.recharge-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 12px 0; }
+.recharge-option { padding: 14px 10px; background: var(--bg-secondary); border: 1px solid var(--border-secondary); border-radius: var(--radius-md); text-align: center; cursor: pointer; transition: all var(--transition-fast); font-size: 13px; color: var(--text-secondary); }
+.recharge-option:hover { border-color: var(--accent-purple); background: rgba(139,92,246,0.05); }
+.recharge-option.selected { border-color: var(--accent-purple); background: rgba(139,92,246,0.08); color: var(--accent-purple-light); font-weight: 600; }
+.recharge-option .r-price { font-size: 20px; font-weight: 700; }
+.recharge-option .r-desc { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+/* SMS code row (phone + send button) */
+.sms-row { display: flex; gap: 10px; }
+.sms-row .form-input { flex: 1; }
+.sms-btn { height: 40px; padding: 0 16px; border: 1px solid var(--accent-purple); border-radius: var(--radius-md); background: transparent; color: var(--accent-purple); font-size: 13px; cursor: pointer; white-space: nowrap; transition: all var(--transition-fast); }
+.sms-btn:hover { background: rgba(139,92,246,0.1); }
+
+/* Inline toggle switch */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-secondary); }
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 13px; color: var(--text-primary); }
+.toggle-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.toggle-switch { position: relative; width: 44px; height: 24px; cursor: pointer; }
+.toggle-switch input { display: none; }
+.toggle-slider { position: absolute; inset: 0; background: var(--border-input); border-radius: 12px; transition: background var(--transition-fast); }
+.toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform var(--transition-fast); }
+.toggle-switch input:checked + .toggle-slider { background: var(--accent-purple); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
