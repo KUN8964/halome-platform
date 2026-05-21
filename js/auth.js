@@ -7,8 +7,8 @@
   'use strict';
 
   // ── 配置 ─────────────────────────────────────────────────
-  var API_BASE = window.location.origin; // 同域部署时自动匹配
-  // 如果前后端分离部署，改为：var API_BASE = 'http://localhost:3000';
+  var API_BASE = 'http://localhost:3000'; // 开发环境后端地址
+  // 生产环境部署时改为空字符串（同域部署）或正确的后端域名
 
   var TOKEN_KEY = 'halome_token';
 
