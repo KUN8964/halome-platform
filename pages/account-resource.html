@@ -126,23 +126,23 @@
         <div class="resource-stats">
           <div class="resource-stat-card">
             <div class="stat-label">存储统计</div>
-            <div class="stat-value">539.1<span class="stat-unit">MB</span></div>
+            <div class="stat-value" id="stat-storage">539.1<span class="stat-unit">MB</span></div>
           </div>
           <div class="resource-stat-card">
             <div class="stat-label">取回统计</div>
-            <div class="stat-value">123.3<span class="stat-unit">MB</span></div>
+            <div class="stat-value" id="stat-retrieval">123.3<span class="stat-unit">MB</span></div>
           </div>
           <div class="resource-stat-card">
             <div class="stat-label">AI模型部署数</div>
-            <div class="stat-value">3<span class="stat-unit">/5</span></div>
+            <div class="stat-value" id="stat-ai-models">3<span class="stat-unit">/5</span></div>
           </div>
           <div class="resource-stat-card">
             <div class="stat-label">本月费用</div>
-            <div class="stat-value">¥1,355.69</div>
+            <div class="stat-value" id="stat-monthly-cost">¥1,355.69</div>
           </div>
           <div class="resource-stat-card">
             <div class="stat-label">余额</div>
-            <div class="stat-value">¥355.69</div>
+            <div class="stat-value" id="stat-balance">¥355.69</div>
           </div>
         </div>
 
@@ -230,5 +230,29 @@
   <script src="../js/auth.js"></script>
   <script>checkAuth();</script>
     <script src="../js/modal.js"></script>
+  <script>
+    // ── 加载资源统计数据 ──────────────────────────────────────
+    async function loadResourceStats() {
+      try {
+        const token = localStorage.getItem('halome_token');
+        const res = await fetch('/api/resource-stats', { headers: { 'Authorization': `Bearer ${token}` } });
+        const json = await res.json();
+        if (json.success) {
+          const d = json.data;
+          // 更新统计卡片
+          document.getElementById('stat-storage').innerHTML = d.storageUsed + '<span class="stat-unit">MB</span>';
+          document.getElementById('stat-retrieval').innerHTML = d.retrievalUsed + '<span class="stat-unit">MB</span>';
+          document.getElementById('stat-ai-models').innerHTML = d.aiModelsDeployed + '<span class="stat-unit">/5</span>';
+          document.getElementById('stat-monthly-cost').textContent = '¥' + d.monthlyCost.toFixed(2);
+          document.getElementById('stat-balance').textContent = '¥' + d.balance.toFixed(2);
+          // 更新成本构成金额
+          const costAmount = document.querySelector('.cost-amount');
+          if (costAmount) costAmount.innerHTML = '¥ ' + d.monthlyCost.toFixed(2) + ' <span class="cost-currency">CNY</span>';
+        }
+      } catch(e) { console.error('加载资源统计失败', e); }
+    }
+    // ── 初始化 ────────────────────────────────────────────
+    loadResourceStats();
+  </script>
   </body>
 </html>

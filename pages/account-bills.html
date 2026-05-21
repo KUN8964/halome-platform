@@ -360,20 +360,86 @@
   <script src="../js/auth.js"></script>
   <script>checkAuth();</script>
   <script>
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+    let billsData = [];
+    let currentPlan = '专业版';
 
-    function showToast(message, type) {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      toast.className = 'toast ' + (type || 'info');
-      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
-      toast.innerHTML = '<span>' + (icons[type]||'ℹ️') + '</span><span>' + message + '</span>';
-      container.appendChild(toast);
-      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
+    // ── 加载账单数据 ──────────────────────────────────────
+    async function loadBills() {
+      try {
+        const token = localStorage.getItem('halome_token');
+        const res = await fetch('/api/bills', { headers: { 'Authorization': `Bearer ${token}` } });
+        const json = await res.json();
+        if (json.success) {
+          billsData = json.data.bills;
+          renderBillsTable(billsData);
+        }
+      } catch(e) { console.error('加载账单失败', e); }
     }
 
+    // ── 渲染账单表格 ──────────────────────────────────────
+    function renderBillsTable(bills) {
+      const tbody = document.querySelector('.bill-table tbody');
+      tbody.innerHTML = bills.map(b => `
+        <tr onclick="openOrderDetail('${b.orderId}','${b.service}','${b.content}','¥ ${b.amount.toFixed(2)}','${b.time}','${b.status}')">
+          <td class="order-id">${b.orderId}</td>
+          <td>${b.service}</td>
+          <td class="cell-muted">${b.content}</td>
+          <td class="amount">¥ ${b.amount.toFixed(2)}</td>
+          <td class="cell-muted">${b.time}</td>
+          <td><span class="bill-status ${b.status}">● ${statusText(b.status)}</span></td>
+          <td><span class="row-action" style="color:var(--text-link);cursor:pointer;">发票</span></td>
+        </tr>
+      `).join('');
+      document.querySelector('.pagination span').textContent = `共 ${json.data.total} 条`;
+    }
+
+    function statusText(s) { return { paid: '已支付', pending: '待支付', cancelled: '已取消' }[s] || s; }
+
+    // ── 加载套餐数据 ──────────────────────────────────────
+    async function loadPlans() {
+      try {
+        const token = localStorage.getItem('halome_token');
+        const res = await fetch('/api/plans', { headers: { 'Authorization': `Bearer ${token}` } });
+        const json = await res.json();
+        if (json.success) {
+          currentPlan = json.data.current;
+          renderPlans(json.data.plans);
+        }
+      } catch(e) { console.error('加载套餐失败', e); }
+    }
+
+    // ── 渲染套餐卡片 ──────────────────────────────────────
+    function renderPlans(plans) {
+      const container = document.querySelector('.plan-cards');
+      container.innerHTML = plans.map(p => `
+        <div class="plan-card ${p.current ? 'selected' : ''}" onclick="selectPlan(this)">
+          <div class="plan-name">${p.name}</div>
+          <div class="plan-price">¥ ${p.price}<span class="plan-unit">/月</span></div>
+          <div class="plan-specs">
+            存储 ${p.storage}<br>
+            取回 ${p.retrieval}<br>
+            Token ${p.tokenIn}/${p.tokenOut}<br>
+            支持 ${p.models === -1 ? '无限制' : p.models + ' 个'}模型部署
+          </div>
+          ${p.current ? '<span class="plan-badge-current">当前套餐</span>' : ''}
+        </div>
+      `).join('');
+    }
+
+    // ── 订单详情 ──────────────────────────────────────────
+    function openOrderDetail(orderId, service, content, amount, time, status) {
+      document.getElementById('detail-order-id').textContent = orderId;
+      document.getElementById('detail-service').textContent = service;
+      document.getElementById('detail-content').textContent = content;
+      document.getElementById('detail-amount').textContent = amount;
+      document.getElementById('detail-time').textContent = time;
+      const statusEl = document.getElementById('detail-status');
+      const statusMap = { paid: '<span class="bill-status paid">● 已支付</span>', pending: '<span class="bill-status pending">● 待支付</span>', cancelled: '<span class="bill-status cancelled">● 已取消</span>' };
+      statusEl.innerHTML = statusMap[status] || status;
+      openModal('modal-order-detail');
+    }
+
+    // ── 套餐选择 ──────────────────────────────────────────
     function selectPlan(el) {
       document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
       el.classList.add('selected');
@@ -386,17 +452,20 @@
       showToast('已提交升级至「' + planName + '」的申请，即将生效', 'success');
     }
 
-    function openOrderDetail(orderId, service, content, amount, time, status) {
-      document.getElementById('detail-order-id').textContent = orderId;
-      document.getElementById('detail-service').textContent = service;
-      document.getElementById('detail-content').textContent = content;
-      document.getElementById('detail-amount').textContent = amount;
-      document.getElementById('detail-time').textContent = time;
-      const statusEl = document.getElementById('detail-status');
-      const statusMap = { paid: '<span class="bill-status paid">● 已支付</span>', pending: '<span class="bill-status pending">● 待支付</span>', cancelled: '<span class="bill-status cancelled">● 已取消</span>' };
-      statusEl.innerHTML = statusMap[status] || status;
-      openModal('modal-order-detail');
+    // ── Toast 提示 ───────────────────────────────────────
+    function showToast(message, type) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast ' + (type || 'info');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      toast.innerHTML = '<span>' + (icons[type]||'ℹ️') + '</span><span>' + message + '</span>';
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(20px)'; setTimeout(() => toast.remove(), 300); }, 2500);
     }
+
+    // ── 初始化 ────────────────────────────────────────────
+    loadPlans();
+    loadBills();
   </script>
     <script src="../js/modal.js"></script>
   </body>

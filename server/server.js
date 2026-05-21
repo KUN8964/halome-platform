@@ -319,6 +319,52 @@ app.get('/api/dashboard', verifyToken, (req, res) => {
   }
 });
 
+// ─── 账单 API ─────────────────────────────────────────────
+// GET /api/bills
+app.get('/api/bills', verifyToken, (req, res) => {
+  const userId = req.user.userId;
+  // 模拟账单数据（实际应从数据库获取）
+  const bills = [
+    { orderId: 'ORD202505200001', service: '云存储', content: '标准存储 100GB · 月付', amount: 99.00, time: '2025-05-20', status: 'paid' },
+    { orderId: 'ORD202505150002', service: 'AI推理', content: 'Token消耗 · 按量计费', amount: 456.69, time: '2025-05-15', status: 'paid' },
+    { orderId: 'ORD202505100003', service: '数据存证', content: '存证服务 · 50次', amount: 200.00, time: '2025-05-10', status: 'paid' },
+    { orderId: 'ORD202505050004', service: '云存储', content: '数据取回 100GB · 月付', amount: 49.00, time: '2025-05-05', status: 'paid' },
+    { orderId: 'ORD202505010005', service: 'AI推理', content: '模型部署 · 月付', amount: 551.00, time: '2025-05-01', status: 'paid' },
+    { orderId: 'ORD202504200007', service: '数据存证', content: '实时出证 · 20次', amount: 150.00, time: '2025-04-20', status: 'cancelled' },
+  ];
+  res.json({ success: true, data: { bills, total: 24, page: 1, pageSize: 10 } });
+});
+
+// ─── 套餐 API ─────────────────────────────────────────────
+// GET /api/plans
+app.get('/api/plans', verifyToken, (_req, res) => {
+  const plans = [
+    { name: '基础版', price: 99, unit: '月', storage: '50 GB', retrieval: '50 GB', tokenIn: '500K', tokenOut: '250K', models: 1 },
+    { name: '专业版', price: 299, unit: '月', storage: '100 GB', retrieval: '100 GB', tokenIn: '1,000K', tokenOut: '500K', models: 5, current: true },
+    { name: '企业版', price: 999, unit: '月', storage: '500 GB', retrieval: '500 GB', tokenIn: '5,000K', tokenOut: '2,500K', models: 20 },
+    { name: '旗舰版', price: 2999, unit: '月', storage: '2 TB', retrieval: '2 TB', tokenIn: '50,000K', tokenOut: '25,000K', models: -1 },
+  ];
+  res.json({ success: true, data: { plans, current: '专业版' } });
+});
+
+// ─── 资源统计 API ─────────────────────────────────────────
+// GET /api/resource-stats
+app.get('/api/resource-stats', verifyToken, (_req, res) => {
+  const stats = {
+    storageUsed: '539.1 MB',
+    retrievalUsed: '123.3 MB',
+    aiModelsDeployed: '3/5',
+    monthlyCost: 1355.69,
+    balance: 355.69,
+    costBreakdown: [
+      { date: '10-1', storage: 30, retrieval: 25, ai: 20, deposit: 15 },
+      { date: '10-7', storage: 35, retrieval: 30, ai: 22, deposit: 18 },
+      { date: '10-31', storage: 25, retrieval: 20, ai: 15, deposit: 12 },
+    ],
+  };
+  res.json({ success: true, data: stats });
+});
+
 // ─── 404 兜底 ───────────────────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: '接口不存在' });
