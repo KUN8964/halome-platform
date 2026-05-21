@@ -29,6 +29,12 @@
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border-secondary);
     }
+    .api-doc-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 10px;
+    }
     .api-doc-content h5 {
       font-size: 14px;
       font-weight: 600;
@@ -43,6 +49,10 @@
     }
     .api-doc-content strong {
       color: var(--text-primary);
+    }
+    .api-doc-content em {
+      color: var(--text-muted);
+      font-style: italic;
     }
     .api-doc-content code {
       background: var(--bg-input);
@@ -66,6 +76,8 @@
       font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
     .api-doc-content table {
       width: 100%;
@@ -77,10 +89,11 @@
       text-align: left;
       padding: 10px 14px;
       background: var(--bg-table-header);
-      color: var(--text-secondary);
+      color: var(--text-primary);
       font-weight: 500;
       border-bottom: 1px solid var(--border-secondary);
-      font-size: 12px;
+      font-size: 13px;
+      white-space: nowrap;
     }
     .api-doc-content td {
       padding: 10px 14px;
@@ -90,14 +103,15 @@
     .api-doc-content tr:hover td {
       background: rgba(139,92,246,0.04);
     }
-    .api-doc-content ul {
+    .api-doc-content ul, .api-doc-content ol {
       margin: 8px 0;
-      padding-left: 20px;
+      padding-left: 24px;
     }
     .api-doc-content li {
       font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.8;
+      margin-bottom: 4px;
     }
     .api-doc-content hr {
       border: none;
@@ -156,22 +170,31 @@
         </div>
         <div class="card">
           <div class="api-doc-content">
-            <h5>简要描述</h5><p>小文件上传</p><h5>请求URL</h5><p><code>https://gw-hangzhou-2.halome.cc/v1/add</code></p><h5>请求方式</h5><p>POST</p><h5>Head 参数</h5><p>|参数名|必选|类型|说明|
-|AuthToken|是|string|token|</p><h5>Body 参数</h5><p>|参数名|必选|类型|说明|
-|file|是|form-data|文件|</p><h5>返回示例</h5><pre><code>{
-  "code": 200,
-  "message": "success",
-  "data": "fileid"
-}</code></pre><h5>返回参数说明</h5><p>|参数名|类型|说明|
-|code|int|200 成功|
-|message|string|消息内容|
-|data|string|文件id|</p><h5>错误码</h5><p>|错误码|说明|
-|200|成功|
-|4|不支持多文件上传|
-|5|单文件大小不能超过100M，大文件上传请调用大文件上传接口|
-|6|文件错误|
-|7|添加到分布式存储系统错误|
-|8|写入数据库错误|</p>
+            <h5>简要描述</h5>
+<ul><li>小文件上传</li></ul>
+<h5>请求URL</h5>
+<ul><li><code> https://gw-hangzhou-2.halome.cc/v1/add </code></li></ul>
+<h5>请求方式</h5>
+<ul><li>POST</li></ul>
+<h5>Head 参数</h5>
+<table><thead><tr><th>参数名</th><th>必选</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>AuthToken</td><td>是</td><td>string</td><td>token</td></tr></tbody></table>
+<h5>Body 参数</h5>
+<table><thead><tr><th>参数名</th><th>必选</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>file</td><td>是</td><td>form-data</td><td>文件</td></tr></tbody></table>
+<h5>返回示例</h5>
+<pre><code>{
+    &quot;code&quot;: 200,
+    &quot;message&quot;: &quot;sucess&quot;,
+    &quot;data&quot;: &quot;fileid&quot;
+}</code></pre>
+<h5>返回参数说明</h5>
+<table><thead><tr><th>参数名</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>code</td><td>int</td><td>200 成功</td></tr><tr><td>message</td><td>string</td><td>消息内容</td></tr><tr><td>data</td><td>string</td><td>文件id</td></tr></tbody></table>
+<h5>code 错误码</h5>
+<p>200 成功</p>
+<p>4 不支持多文件上传</p>
+<p>5 单文件大小不能超过100M，大文件上传请调用大文件上传接口</p>
+<p>6 文件错误</p>
+<p>7 添加到分布是存储系统错误</p>
+<p>8 写入数据库错误</p>
           </div>
         </div>
       </main>

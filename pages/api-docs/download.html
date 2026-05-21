@@ -29,6 +29,12 @@
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border-secondary);
     }
+    .api-doc-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 10px;
+    }
     .api-doc-content h5 {
       font-size: 14px;
       font-weight: 600;
@@ -43,6 +49,10 @@
     }
     .api-doc-content strong {
       color: var(--text-primary);
+    }
+    .api-doc-content em {
+      color: var(--text-muted);
+      font-style: italic;
     }
     .api-doc-content code {
       background: var(--bg-input);
@@ -66,6 +76,8 @@
       font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
     .api-doc-content table {
       width: 100%;
@@ -77,10 +89,11 @@
       text-align: left;
       padding: 10px 14px;
       background: var(--bg-table-header);
-      color: var(--text-secondary);
+      color: var(--text-primary);
       font-weight: 500;
       border-bottom: 1px solid var(--border-secondary);
-      font-size: 12px;
+      font-size: 13px;
+      white-space: nowrap;
     }
     .api-doc-content td {
       padding: 10px 14px;
@@ -90,14 +103,15 @@
     .api-doc-content tr:hover td {
       background: rgba(139,92,246,0.04);
     }
-    .api-doc-content ul {
+    .api-doc-content ul, .api-doc-content ol {
       margin: 8px 0;
-      padding-left: 20px;
+      padding-left: 24px;
     }
     .api-doc-content li {
       font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.8;
+      margin-bottom: 4px;
     }
     .api-doc-content hr {
       border: none;
@@ -156,8 +170,22 @@
         </div>
         <div class="card">
           <div class="api-doc-content">
-            <h5>高隐私方式，不暴露文件ID</h5><h5>请求URL</h5><p><code>https://gw-hangzhou-2.halome.cc/v1/cat?id=QmbDSjb5MZiMxt2puGqwmPC7rNARpAVfcsRPZpBApWUXCd</code></p><h5>请求方式</h5><p>GET</p><h5>Head 参数</h5><p>|参数名|必选|类型|说明|
-|AuthToken|是|string|token|</p><h5>返回</h5><p>文件流</p><hr><h5>无隐私，泄漏文件ID，适合图片等资源文件</h5><h5>请求URL</h5><p><code>https://gw-hangzhou-2.halome.cc/v1/cat/direct?id=QmbDSjb5MZiMxt2puGqwmPC7rNARpAVfcsRPZpBApWUXCd&AuthToken=</code></p><h5>请求方式</h5><p>GET</p><h5>返回</h5><p>文件流</p>
+            <h5>高隐私方式，不暴露文件ID</h5>
+<h5>请求URL</h5>
+<ul><li><code> https://gw-hangzhou-2.halome.cc/v1/cat?id=QmbDSjb5MZiMxt2puGqwmPC7rNARpAVfcsRPZpBApWUXCd </code></li></ul>
+<h5>请求方式</h5>
+<ul><li>GET</li></ul>
+<h5>Head 参数</h5>
+<table><thead><tr><th>参数名</th><th>必选</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>AuthToken</td><td>是</td><td>string</td><td>token</td></tr></tbody></table>
+<h5>返回文件流</h5>
+<p>------------------------------------------------------------------------</p>
+<p>------------------------------------------------------------------------</p>
+<h5>无隐私，暴漏文件ID，适合图片等资源文件</h5>
+<h5>请求URL</h5>
+<ul><li><code> https://gw-hangzhou-2.halome.cc/v1/cat/direct?id=QmbDSjb5MZiMxt2puGqwmPC7rNARpAVfcsRPZpBApWUXCd&amp;AuthToken= </code></li></ul>
+<h5>请求方式</h5>
+<ul><li>GET</li></ul>
+<h5>返回文件流</h5>
           </div>
         </div>
       </main>

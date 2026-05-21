@@ -29,6 +29,12 @@
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border-secondary);
     }
+    .api-doc-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 10px;
+    }
     .api-doc-content h5 {
       font-size: 14px;
       font-weight: 600;
@@ -43,6 +49,10 @@
     }
     .api-doc-content strong {
       color: var(--text-primary);
+    }
+    .api-doc-content em {
+      color: var(--text-muted);
+      font-style: italic;
     }
     .api-doc-content code {
       background: var(--bg-input);
@@ -66,6 +76,8 @@
       font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
     .api-doc-content table {
       width: 100%;
@@ -77,10 +89,11 @@
       text-align: left;
       padding: 10px 14px;
       background: var(--bg-table-header);
-      color: var(--text-secondary);
+      color: var(--text-primary);
       font-weight: 500;
       border-bottom: 1px solid var(--border-secondary);
-      font-size: 12px;
+      font-size: 13px;
+      white-space: nowrap;
     }
     .api-doc-content td {
       padding: 10px 14px;
@@ -90,14 +103,15 @@
     .api-doc-content tr:hover td {
       background: rgba(139,92,246,0.04);
     }
-    .api-doc-content ul {
+    .api-doc-content ul, .api-doc-content ol {
       margin: 8px 0;
-      padding-left: 20px;
+      padding-left: 24px;
     }
     .api-doc-content li {
       font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.8;
+      margin-bottom: 4px;
     }
     .api-doc-content hr {
       border: none;
@@ -156,23 +170,33 @@
         </div>
         <div class="card">
           <div class="api-doc-content">
-            <h5>简要描述</h5><p>获取文件列表</p><h5>请求URL</h5><p><code>https://gw-dezhou-1.halome.cc:4005/v1/listFiles?page=1&page_size=20</code></p><h5>请求方式</h5><p>GET</p><h5>Head 参数</h5><p>|参数名|必选|类型|说明|
-|AuthToken|是|string|token|</p><h5>返回结果</h5><pre><code>{
-  "code": 200,
-  "message": "获取成功",
-  "data": [
-    {
-      "cid": "文件CID",
-      "file_name": "文件名",
-      "file_type": "文件类型",
-      "file_size": 文件大小,
-      "creat_time": 创建时间戳
-    }
+            <h5>简要描述</h5>
+<ul><li>获取文件列表</li></ul>
+<h5>请求URL</h5>
+<ul><li><code> https://gw-dezhou-1.halome.cc:4005/v1/listFiles?page=1&amp;page_size=20 </code></li></ul>
+<h5>请求方式</h5>
+<ul><li>GET</li></ul>
+<h5>Head 参数</h5>
+<table><thead><tr><th>参数名</th><th>必选</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>AuthToken</td><td>是</td><td>string</td><td>token</td></tr></tbody></table>
+<h5>返回文件</h5>
+<pre><code>{
+  &quot;code&quot;: 200,
+  &quot;message&quot;: &quot;获取成功&quot;,
+  &quot;data&quot;: [
+	{
+		&quot;cid&quot;: &quot;文件CID&quot;,
+		&quot;file_name&quot;: &quot;文件名&quot;,
+		&quot;file_type&quot;: &quot;文件类型&quot;,
+		&quot;file_size&quot;: 文件大小,
+		&quot;creat_time&quot;: 创建时间戳
+	}
   ],
-  "total": 总记录数,
-  "page": 当前页码,
-  "page_size": 每页大小
+  &quot;total&quot;: 总记录数,
+  &quot;page&quot;: 当前页码,
+  &quot;page_size&quot;: 每页大小
 }</code></pre>
+<h5>备注</h5>
+<ul><li>无</li></ul>
           </div>
         </div>
       </main>

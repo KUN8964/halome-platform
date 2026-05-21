@@ -29,6 +29,12 @@
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border-secondary);
     }
+    .api-doc-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 10px;
+    }
     .api-doc-content h5 {
       font-size: 14px;
       font-weight: 600;
@@ -43,6 +49,10 @@
     }
     .api-doc-content strong {
       color: var(--text-primary);
+    }
+    .api-doc-content em {
+      color: var(--text-muted);
+      font-style: italic;
     }
     .api-doc-content code {
       background: var(--bg-input);
@@ -66,6 +76,8 @@
       font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
     .api-doc-content table {
       width: 100%;
@@ -77,10 +89,11 @@
       text-align: left;
       padding: 10px 14px;
       background: var(--bg-table-header);
-      color: var(--text-secondary);
+      color: var(--text-primary);
       font-weight: 500;
       border-bottom: 1px solid var(--border-secondary);
-      font-size: 12px;
+      font-size: 13px;
+      white-space: nowrap;
     }
     .api-doc-content td {
       padding: 10px 14px;
@@ -90,14 +103,15 @@
     .api-doc-content tr:hover td {
       background: rgba(139,92,246,0.04);
     }
-    .api-doc-content ul {
+    .api-doc-content ul, .api-doc-content ol {
       margin: 8px 0;
-      padding-left: 20px;
+      padding-left: 24px;
     }
     .api-doc-content li {
       font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.8;
+      margin-bottom: 4px;
     }
     .api-doc-content hr {
       border: none;
@@ -156,31 +170,33 @@
         </div>
         <div class="card">
           <div class="api-doc-content">
-            <h5>简要描述</h5><p>获取用户空间和流量相关信息</p><h5>请求URL</h5><p><code>https://gw-hangzhou-2.halome.cc/u/getUserStorageInfo</code></p><h5>请求方式</h5><p>GET</p><h5>Head 参数</h5><p>|参数名|必选|类型|说明|
-|AuthToken|是|string|token|</p><h5>返回结果</h5><pre><code>{
-  "code": 200,
-  "msg": "success",
-  "data": {
-    "Account": "",
-    "SpaceName": "",
-    "SpaceSize": 11112123,
-    "SpaceUsed": 123123,
-    "SpaceExpirationDate": 123123213,
-    "FlowSize": 213123312,
-    "FlowUsed": 12312312,
-    "FlowExpirationDate": 170123123,
-    "Status": 0
-  }
-}</code></pre><h5>返回参数说明</h5><p>|参数名|类型|说明|
-|Account|string|账号|
-|SpaceName|string|空间名称|
-|SpaceSize|int|购买空间大小（单位字节）|
-|SpaceUsed|int|空间使用量（单位字节）|
-|SpaceExpirationDate|int|空间到期时间（时间戳）|
-|FlowSize|int|购买流量大小（单位字节）|
-|FlowUsed|int|流量使用量（单位字节）|
-|FlowExpirationDate|int|流量到期时间（时间戳）|
-|Status|int|账号状态（0正常，1异常）|</p>
+            <h5>简要描述</h5>
+<ul><li>获取用户空间和流量相关信息</li></ul>
+<h5>请求URL</h5>
+<ul><li><code> https://gw-hangzhou-2.halome.cc/u/getUserStorageInfo </code></li></ul>
+<h5>请求方式</h5>
+<ul><li>GET</li></ul>
+<h5>Head 参数</h5>
+<table><thead><tr><th>参数名</th><th>必选</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>AuthToken</td><td>是</td><td>string</td><td>token</td></tr></tbody></table>
+<h5>返回结果</h5>
+<pre><code>{
+    &quot;code&quot;:200,
+    &quot;msg&quot;:&quot;success&quot;,
+    &quot;data&quot;:{
+        &quot;Account&quot;:&quot;&quot;,
+        &quot;SpaceName&quot;:&quot;&quot;,
+        &quot;SpaceSize&quot;:11112123,
+        &quot;SpaceUsed&quot;:123123,
+        &quot;SpaceExpirationDate&quot;:123123213,
+        &quot;FlowSize&quot;:213123312,
+        &quot;FlowUsed&quot;:12312312,
+        &quot;FlowExpirationDate&quot;:170123123,
+        &quot;Status&quot;:0
+    }
+}</code></pre>
+<table><thead><tr><th>参数名</th><th>类型</th><th>说明</th></tr></thead><tbody><tr><td>Account</td><td>string</td><td>账号</td></tr><tr><td>SpaceName</td><td>string</td><td>空间名称</td></tr><tr><td>SpaceSize</td><td>int</td><td>购买空间大小（单位字节）</td></tr><tr><td>SpaceUsed</td><td>int</td><td>空间使用量（单位字节）</td></tr><tr><td>SpaceExpirationDate</td><td>int</td><td>空间到期时间（时间戳）</td></tr><tr><td>FlowSize</td><td>int</td><td>购买流量大小（单位字节）</td></tr><tr><td>FlowUsed</td><td>int</td><td>流量使用量（单位字节）</td></tr><tr><td>FlowExpirationDate</td><td>int</td><td>流量到期时间（时间戳）</td></tr><tr><td>Status</td><td>int</td><td>账号状态（0正常，1异常）</td></tr></tbody></table>
+<h5>备注</h5>
+<ul><li>无</li></ul>
           </div>
         </div>
       </main>

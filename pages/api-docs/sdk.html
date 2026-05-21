@@ -29,6 +29,12 @@
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border-secondary);
     }
+    .api-doc-content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 10px;
+    }
     .api-doc-content h5 {
       font-size: 14px;
       font-weight: 600;
@@ -43,6 +49,10 @@
     }
     .api-doc-content strong {
       color: var(--text-primary);
+    }
+    .api-doc-content em {
+      color: var(--text-muted);
+      font-style: italic;
     }
     .api-doc-content code {
       background: var(--bg-input);
@@ -66,6 +76,8 @@
       font-size: 13px;
       color: var(--text-secondary);
       line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
     .api-doc-content table {
       width: 100%;
@@ -77,10 +89,11 @@
       text-align: left;
       padding: 10px 14px;
       background: var(--bg-table-header);
-      color: var(--text-secondary);
+      color: var(--text-primary);
       font-weight: 500;
       border-bottom: 1px solid var(--border-secondary);
-      font-size: 12px;
+      font-size: 13px;
+      white-space: nowrap;
     }
     .api-doc-content td {
       padding: 10px 14px;
@@ -90,14 +103,15 @@
     .api-doc-content tr:hover td {
       background: rgba(139,92,246,0.04);
     }
-    .api-doc-content ul {
+    .api-doc-content ul, .api-doc-content ol {
       margin: 8px 0;
-      padding-left: 20px;
+      padding-left: 24px;
     }
     .api-doc-content li {
       font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.8;
+      margin-bottom: 4px;
     }
     .api-doc-content hr {
       border: none;
@@ -156,12 +170,11 @@
         </div>
         <div class="card">
           <div class="api-doc-content">
-            <h3>光宇云 Go SDK</h3>
-<a href="https://github.com/HalomeOS/go-sdk" target="_blank">GitHub → go-sdk</a></p><h3>光宇云 Java SDK</h3>
-<a href="https://github.com/HalomeOS/java-sdk" target="_blank">GitHub → java-sdk</a></p><h3>光宇云 C# .NET SDK</h3>
-<a href="https://github.com/HalomeOS/dotnet-sdk" target="_blank">GitHub → dotnet-sdk</a></p><h3>光宇云 PHP SDK</h3>
-<a href="https://github.com/HalomeOS/php-sdk" target="_blank">GitHub → php-sdk</a></p><h3>光宇云 Python SDK</h3>
-<a href="https://github.com/HalomeOS/python-sdk" target="_blank">GitHub → python-sdk</a></p>
+            <h3>GuangYuYun Go SDK 地址：<a href="https://github.com/HalomeOS/go-sdk" title="go-sdk" target="_blank" rel="noopener">Go-SDK</a></h3>
+<h3>GuangYuYun Java SDK 地址：<a href="https://github.com/HalomeOS/java-sdk" title="java-sdk" target="_blank" rel="noopener">Java-SDK</a></h3>
+<h3>GuangYuYun C# .net SDK 地址：<a href="https://github.com/HalomeOS/dotnet-sdk" title="dotnet-sdk" target="_blank" rel="noopener">dotnet-sdk</a></h3>
+<h3>GuangYuYun php SDK 地址：<a href="https://github.com/HalomeOS/php-sdk" title="php-sdk" target="_blank" rel="noopener">php-sdk</a></h3>
+<h3>GuangYuYun python SDK 地址：<a href="https://github.com/HalomeOS/python-sdk" title="python-sdk" target="_blank" rel="noopener">python-sdk</a></h3>
           </div>
         </div>
       </main>
