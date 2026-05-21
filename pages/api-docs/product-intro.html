@@ -7,48 +7,49 @@
   <link rel="stylesheet" href="../../css/theme.css">
   <style>
     .api-doc-page .page-header {
-      margin-bottom: 32px;
-    }
-    .api-doc-page .page-header h2 {
-      font-size: 22px;
-      font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 24px;
     }
     .api-doc-page .page-header .breadcrumb {
       font-size: 12px;
       color: var(--text-muted);
+      margin-bottom: 8px;
     }
     .api-doc-page .page-header .breadcrumb a {
       color: var(--text-link);
       text-decoration: none;
     }
+    .api-doc-page .page-header .breadcrumb a:hover {
+      text-decoration: underline;
+    }
     .api-doc-content h3 {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 600;
-      margin: 28px 0 12px;
-      padding-bottom: 8px;
+      margin: 24px 0 10px;
+      padding-bottom: 6px;
       border-bottom: 1px solid var(--border-secondary);
+      color: var(--text-primary);
     }
     .api-doc-content h4 {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 24px 0 10px;
-    }
-    .api-doc-content h5 {
       font-size: 14px;
       font-weight: 600;
       color: var(--accent-purple-light);
       margin: 20px 0 8px;
     }
-    .api-doc-content p {
-      font-size: 14px;
+    .api-doc-content h5 {
+      font-size: 13px;
+      font-weight: 600;
       color: var(--text-secondary);
-      line-height: 1.8;
-      margin: 0 0 12px;
+      margin: 16px 0 6px;
+    }
+    .api-doc-content p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin: 0 0 10px;
     }
     .api-doc-content strong {
       color: var(--text-primary);
+      font-weight: 500;
     }
     .api-doc-content em {
       color: var(--text-muted);
@@ -56,67 +57,80 @@
     }
     .api-doc-content code {
       background: var(--bg-input);
-      padding: 2px 8px;
-      border-radius: 4px;
+      padding: 1px 6px;
+      border-radius: 3px;
       font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 13px;
+      font-size: 12px;
       color: var(--accent-purple-light);
     }
     .api-doc-content pre {
       background: var(--bg-input);
       border: 1px solid var(--border-secondary);
       border-radius: var(--radius-md);
-      padding: 16px 20px;
+      padding: 14px 18px;
       overflow-x: auto;
-      margin: 12px 0;
+      margin: 10px 0;
     }
     .api-doc-content pre code {
       background: none;
       padding: 0;
-      font-size: 13px;
+      font-size: 12px;
       color: var(--text-secondary);
-      line-height: 1.7;
+      line-height: 1.6;
       white-space: pre-wrap;
       word-break: break-all;
     }
     .api-doc-content table {
       width: 100%;
       border-collapse: collapse;
-      margin: 12px 0;
-      font-size: 13px;
+      margin: 10px 0;
+      font-size: 12px;
     }
     .api-doc-content th {
       text-align: left;
-      padding: 10px 14px;
+      padding: 8px 12px;
       background: var(--bg-table-header);
       color: var(--text-primary);
       font-weight: 500;
       border-bottom: 1px solid var(--border-secondary);
-      font-size: 13px;
+      font-size: 12px;
       white-space: nowrap;
     }
     .api-doc-content td {
-      padding: 10px 14px;
+      padding: 8px 12px;
       color: var(--text-secondary);
       border-bottom: 1px solid var(--border-secondary);
+      font-size: 12px;
     }
     .api-doc-content tr:hover td {
       background: rgba(139,92,246,0.04);
     }
     .api-doc-content ul, .api-doc-content ol {
       margin: 8px 0;
-      padding-left: 24px;
+      padding-left: 22px;
     }
     .api-doc-content li {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-secondary);
-      line-height: 1.8;
+      line-height: 1.7;
       margin-bottom: 4px;
+    }
+    .api-doc-content ol > li {
+      margin-bottom: 12px;
+    }
+    .api-doc-content ol > li > strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    .api-doc-content ol > li > p:first-child {
+      margin-top: 4px;
     }
     .api-doc-content hr {
       border: none;
       border-top: 1px solid var(--border-secondary);
-      margin: 24px 0;
+      margin: 20px 0;
     }
     .api-doc-content a {
       color: var(--text-link);
@@ -132,17 +146,17 @@
       background: var(--bg-input);
       border: 1px solid var(--border-secondary);
       border-radius: var(--radius-md);
-      padding: 8px 14px;
+      padding: 6px 12px;
       font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 13px;
+      font-size: 12px;
       color: var(--accent-green);
       margin: 4px 0;
     }
     .method-badge {
       display: inline-block;
-      padding: 2px 10px;
+      padding: 2px 8px;
       border-radius: var(--radius-sm);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       text-transform: uppercase;
     }
@@ -166,25 +180,23 @@
           <div class="breadcrumb">
             <a href="../../index.html">首页</a> &rsaquo; 资源中心 &rsaquo; API文档
           </div>
-          <h2>光宇云产品介绍</h2>
+          <h1 class="page-title">光宇云产品介绍</h1>
         </div>
         <div class="card">
           <div class="api-doc-content">
-            <p><strong>一、产品定位</strong></p>
+<p><strong>一、产品定位</strong></p>
 <p>光宇云存储平台是一套面向企业、开发者及各类数据密集型业务的分布式云存储与数据服务体系。</p>
 <p>平台基于分布式架构与弹性资源调度，支持大规模横向扩展、多副本冗余存储、跨地域自动容灾，能够满足从对象存储、文件存储的多样化需求。</p>
 <p>与传统中心化云存储相比，光宇云通过节点自治与协作机制，彻底消除了单点瓶颈与故障风险，实现 更高的数据可靠性、更灵活的弹性扩展能力以及更低的总体拥有成本（TCO）。</p>
 <p><strong>二、架构设计</strong></p>
-<ol><li>去中心化架构</li></ol>
-<p>节点对等互联：所有存储节点均以对等角色参与数据存储与服务提供，无需依赖中心节点，避免单点故障。</p>
+<ol>
+<li><strong>去中心化架构</strong><p>节点对等互联：所有存储节点均以对等角色参与数据存储与服务提供，无需依赖中心节点，避免单点故障。</p>
 <p>弹性扩展：节点可随时动态加入或退出集群，系统自动感知并重构数据分布，以支撑业务量的快速增长与缩减。</p>
-<p>跨地域分布：数据副本分散存储在不同物理机房或区域级节点，保证地理级别的高可用性。</p>
-<ol><li>多副本冗余与一致性机制</li></ol>
-<p>双副本标准：默认每份数据至少存储两个副本，确保在硬件或网络异常情况下仍可快速恢复。</p>
+<p>跨地域分布：数据副本分散存储在不同物理机房或区域级节点，保证地理级别的高可用性。</p></li>
+<li><strong>多副本冗余与一致性机制</strong><p>双副本标准：默认每份数据至少存储两个副本，确保在硬件或网络异常情况下仍可快速恢复。</p>
 <p>一致性协议：支持 Raft、Paxos 等强一致性协议，也可选择最终一致性策略，兼顾性能与可靠性。</p>
-<p>智能副本调度：根据节点负载、网络带宽和物理位置动态调度副本，提高整体访问效率。</p>
-<ol><li>数据访问与安全</li></ol>
-<p>统一接口：提供 RESTful API 与多语言 SDK，支持与现有业务系统无缝集成。</p>
+<p>智能副本调度：根据节点负载、网络带宽和物理位置动态调度副本，提高整体访问效率。</p></li>
+<li><strong>数据访问与安全</strong><p>统一接口：提供 RESTful API 与多语言 SDK，支持与现有业务系统无缝集成。</p>
 <p>多层安全防护：内置 ACL 权限管理、SSL/TLS 加密传输机制，以及数据静态加密存储。</p>
 <p>安全防御能力：内置防御 DDoS、暴力破解及恶意访问的安全策略，保障服务连续性。</p>
 <p><strong>三、核心能力</strong></p>
@@ -204,7 +216,8 @@
 <p>高性能：支持 PB 级数据存储，轻松应对百万级并发请求。</p>
 <p>高安全：全链路加密、分级权限管理与入侵检测，构建全方位安全体系。</p>
 <p>低成本：按需扩展、资源弹性调度，大幅降低企业硬件与运维成本。</p>
-<p>开放兼容：支持主流开发框架与协议，企业可平滑迁移与快速集成。</p>
+<p>开放兼容：支持主流开发框架与协议，企业可平滑迁移与快速集成。</p></li>
+</ol>
           </div>
         </div>
       </main>
