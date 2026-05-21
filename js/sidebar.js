@@ -87,7 +87,7 @@
       `;
       item.children.forEach(child => {
         const isActive = currentPage === child.page;
-        const childPrefix = item.prefix ? (isInApiDocs ? '' : item.prefix) : linkPrefix;
+        const childPrefix = item.prefix ? (isInApiDocs ? '' : linkPrefix + item.prefix) : linkPrefix;
         html += `<a href="${childPrefix}${child.page}.html" class="nav-subitem ${isActive ? 'active' : ''}">${child.label}</a>`;
       });
       html += `</div></div>`;
