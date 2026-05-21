@@ -429,6 +429,21 @@ app.get('/api/inference', verifyToken, (_req, res) => {
   res.json({ success: true, data });
 });
 
+// ─── AI 模型管理 API ─────────────────────────────────────
+// GET /api/ai-models
+app.get('/api/ai-models', verifyToken, (_req, res) => {
+  const data = {
+    overvieStats: { weeklyCalls: 35190, totalModels: '3/5', running: 1, abnormal: 1, revenue: 4536.99 },
+    models: [
+      { name: 'Model-X', status: 'running', revenue: 2100.50, calls: 12500, createdAt: '2025-05-01' },
+      { name: 'Model-NPU-6b', status: 'stopped', revenue: 1567.29, calls: 8920, createdAt: '2025-04-15' },
+      { name: 'GLM-4.6', status: 'error', revenue: 869.20, calls: 13770, createdAt: '2025-03-20' },
+    ],
+    usage: { balance: 355.69, monthlyCost: 1355.69, bill: 1500, cert: 0 },
+  };
+  res.json({ success: true, data });
+});
+
 // ─── 404 兜底 ───────────────────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: '接口不存在' });
