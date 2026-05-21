@@ -326,7 +326,7 @@
                   <th>操作</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="ai-model-tbody">
                 <tr>
                   <td class="model-name">gemma3:7b-it-q4_k_m</td>
                   <td>
@@ -710,7 +710,40 @@
   <script src="../js/auth.js"></script>
   <script>checkAuth();</script>
   <script>
-    // Model tab switching
+    // ── 加载 AI 模型数据 ──────────────────────────────────────
+    async function loadAiModelsData() {
+      try {
+        const token = localStorage.getItem('halome_token');
+        const res = await fetch('/api/ai-models', { headers: { 'Authorization': `Bearer ${token}` } });
+        const json = await res.json();
+        if (json.success) {
+          const d = json.data;
+          // 更新概览统计
+          const statsEls = document.querySelectorAll('.overview-stats .stat-value');
+          if (statsEls[0]) statsEls[0].textContent = d.overviewStats.weeklyCalls.toLocaleString() + ' 次';
+          // 更新模型表格
+          renderModelTable(d.models);
+        }
+      } catch(e) { console.error('加载 AI 模型数据失败', e); }
+    }
+
+    function renderModelTable(models) {
+      const tbody = document.getElementById('ai-model-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = models.map(m => `
+        <tr>
+          <td class="model-name">${m.name}</td>
+          <td>
+            <span class="status-text"><span class="status-dot ${m.status}"></span>${m.status === 'running' ? '运行中' : m.status === 'stopped' ? '未运行' : '异常'}</span>
+          </td>
+          <td>${m.revenue.toFixed(2)}</td>
+          <td>${m.calls.toLocaleString()}</td>
+          <td>${m.createdAt}</td>
+        </tr>
+      `).join('');
+    }
+
+    // ── Model tab switching ─────────────────────────────────
     document.querySelectorAll('.model-tab').forEach(tab => {
       tab.addEventListener('click', function() {
         const target = this.dataset.modelTab;
@@ -721,29 +754,16 @@
       });
     });
 
-    // ===== MODAL =====
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
-
-    function showToast(m, t) {
-      const c = document.getElementById('toast-container'), d = document.createElement('div');
-      d.className = 'toast ' + (t||'info');
-      d.innerHTML = '<span>' + ({success:'✅',error:'❌',info:'ℹ️'}[t]||'ℹ️') + '</span><span>' + m + '</span>';
-      c.appendChild(d);
-      setTimeout(() => { d.style.opacity = '0'; d.style.transform = 'translateX(20px)'; setTimeout(() => d.remove(), 300); }, 2500);
-    }
-
-    // Recharge
+    // ── Recharge ──────────────────────────────────────
     let rAmount = 500;
     function selectROption(el, amt) { document.querySelectorAll('.recharge-option').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); rAmount = amt; }
     function confirmRecharge() { closeModal('modal-recharge'); showToast('充值成功！已到账 ¥' + rAmount, 'success'); }
 
-    // Delete model
+    // ── Delete model ─────────────────────────────────
     function delModel(name) { document.getElementById('delete-model-name').textContent = name; openModal('modal-delete-model'); }
     function confirmDeleteModel() { closeModal('modal-delete-model'); showToast('模型已删除，相关 API Key 已失效', 'info'); }
 
-    // API Key
+    // ── API Key ──────────────────────────────────────
     function viewApiKey(modelName) {
       document.getElementById('apikey-model').textContent = modelName;
       document.getElementById('apikey-value').textContent = 'sk-' + modelName.replace(/\s/g,'').toLowerCase() + '-halome-2025';
@@ -754,7 +774,16 @@
       navigator.clipboard.writeText(key).then(() => showToast('API Key 已复制', 'success')).catch(() => showToast('复制失败', 'error'));
     }
 
-    // Hook existing action links
+    // ── Toast ──────────────────────────────────────
+    function showToast(m, t) {
+      const c = document.getElementById('toast-container'), d = document.createElement('div');
+      d.className = 'toast ' + (t||'info');
+      d.innerHTML = '<span>' + ({success:'✅',error:'❌',info:'ℹ️'}[t]||'ℹ️') + '</span><span>' + m + '</span>';
+      c.appendChild(d);
+      setTimeout(() => { d.style.opacity = '0'; d.style.transform = 'translateX(20px)'; setTimeout(() => d.remove(), 300); }, 2500);
+    }
+
+    // ── Hook existing action links ─────────────────────────
     document.querySelectorAll('.action-links .danger').forEach(a => {
       a.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -774,6 +803,9 @@
         viewApiKey(name);
       });
     });
+
+    // ── 初始化 ───────────────────────────────────────────
+    loadAiModelsData();
   </script>
     <script src="../js/modal.js"></script>
   </body>
