@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HALOME API 测试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>HALOME API 连接测试</h1>
+    <p>这个页面用于测试前端是否能正常连接后端API（http://localhost:3000）</p>
+    
+    <div class="test-section">
+        <h2>测试1: 健康检查 (不需要登录)</h2>
+        <button onclick="testHealth()">测试 /api/health</button>
+        <div id="result1"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试2: 发送验证码</h2>
+        <input type="text" id="phone" value="13800138000" placeholder="手机号">
+        <button onclick="testSendSms()">发送验证码</button>
+        <div id="result2"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试3: 登录</h2>
+        <input type="text" id="code" placeholder="验证码" value="123456">
+        <button onclick="testLogin()">登录</button>
+        <div id="result3"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试4: 获取用户信息 (需要登录)</h2>
+        <button onclick="testGetMe()">获取用户信息</button>
+        <div id="result4"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>测试5: 控制台仪表板 (需要登录)</h2>
+        <button onclick="testDashboard()">获取仪表板数据</button>
+        <div id="result5"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        let token = localStorage.getItem('test_token') || '';
+
+        function showResult(id, success, data) {
+            const div = document.getElementById(id);
+            div.className = success ? 'success' : 'error';
+            div.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        async function testHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/api/health`);
+                const data = await res.json();
+                showResult('result1', res.ok, data);
+            } catch (e) {
+                showResult('result1', false, { error: e.message });
+            }
+        }
+
+        async function testSendSms() {
+            const phone = document.getElementById('phone').value;
+            try {
+                const res = await fetch(`${API_BASE}/api/sms/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone })
+                });
+                const data = await res.json();
+                showResult('result2', res.ok, data);
+                if (data.dev_code) {
+                    document.getElementById('code').value = data.dev_code;
+                    alert(`验证码是: ${data.dev_code}`);
+                }
+            } catch (e) {
+                showResult('result2', false, { error: e.message });
+            }
+        }
+
+        async function testLogin() {
+            const phone = document.getElementById('phone').value;
+            const code = document.getElementById('code').value;
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, code })
+                });
+                const data = await res.json();
+                showResult('result3', res.ok, data);
+                if (data.success && data.data && data.data.token) {
+                    token = data.data.token;
+                    localStorage.setItem('test_token', token);
+                    alert('登录成功！Token已保存');
+                }
+            } catch (e) {
+                showResult('result3', false, { error: e.message });
+            }
+        }
+
+        async function testGetMe() {
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                showResult('result4', res.ok, data);
+            } catch (e) {
+                showResult('result4', false, { error: e.message });
+            }
+        }
+
+        async function testDashboard() {
+            try {
+                const res = await fetch(`${API_BASE}/api/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                showResult('result5', res.ok, data);
+            } catch (e) {
+                showResult('result5', false, { error: e.message });
+            }
+        }
+
+        // 页面加载时自动测试健康检查
+        window.onload = () => testHealth();
+    </script>
+</body>
+</html>

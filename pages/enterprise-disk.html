@@ -380,35 +380,8 @@
         <!-- 已认证状态 -->
         <div class="state-content active" id="state-authed">
           <!-- 用量情况 -->
-          <div class="disk-usage-grid">
-            <div class="disk-usage-item">
-              <div class="usage-title">存储使用情况</div>
-              <div class="usage-value">539.1 MB</div>
-              <div style="font-size:13px;color:var(--text-muted);">/ 100 GB</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:0.5%"></div></div>
-              <div class="usage-expire">有效期至 2025年12月31日</div>
-            </div>
-            <div class="disk-usage-item">
-              <div class="usage-title">取回统计</div>
-              <div class="usage-value">123.3 MB</div>
-              <div style="font-size:13px;color:var(--text-muted);">/ 100 GB</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:0.1%"></div></div>
-              <div class="usage-expire">有效期至 2025年12月31日</div>
-            </div>
-            <div class="disk-usage-item">
-              <div class="usage-title">Token输入量</div>
-              <div class="usage-value">456,780</div>
-              <div style="font-size:13px;color:var(--text-muted);">/ 1,000,000</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:45.6%;background:var(--accent-blue)"></div></div>
-              <div class="usage-expire">有效期至 2025年12月31日</div>
-            </div>
-            <div class="disk-usage-item">
-              <div class="usage-title">Token输出量</div>
-              <div class="usage-value">234,560</div>
-              <div style="font-size:13px;color:var(--text-muted);">/ 500,000</div>
-              <div class="progress-bar"><div class="progress-fill" style="width:46.9%;background:var(--accent-green)"></div></div>
-              <div class="usage-expire">有效期至 2025年12月31日</div>
-            </div>
+          <div class="disk-usage-grid" id="disk-usage-grid">
+            <!-- 动态渲染 -->
           </div>
 
           <!-- 组织架构 -->
@@ -1274,11 +1247,60 @@
       }, 2500);
     }
 
+    // ==================== API DATA ====================
+    const API_BASE = 'http://localhost:3000';
+
+    function getAuthHeader() {
+      var token = localStorage.getItem('halome_token');
+      return token ? { 'Authorization': 'Bearer ' + token } : {};
+    }
+
+    // 加载企业云盘数据
+    function loadEnterpriseDiskData() {
+      fetch(API_BASE + '/api/enterprise-disk', {
+        headers: getAuthHeader()
+      })
+      .then(function(res) { return res.json(); })
+      .then(function(result) {
+        if (result.success && result.data) {
+          renderDiskStats(result.data.stats);
+          if (result.data.enterprise) {
+            document.getElementById('total-member-count').textContent = result.data.enterprise.memberCount + ' 人';
+          }
+        }
+      })
+      .catch(function(err) {
+        console.error('加载企业云盘数据失败:', err);
+        // 使用默认数据
+        renderDiskStats([
+          { title: '存储使用情况', value: '539.1 MB', total: '100 GB', percent: 0.5, expireDate: '2025年12月31日', color: 'var(--accent-purple)' },
+          { title: '取回统计', value: '123.3 MB', total: '100 GB', percent: 0.1, expireDate: '2025年12月31日', color: 'var(--accent-blue)' },
+          { title: 'Token输入量', value: '456,780', total: '1,000,000', percent: 45.6, expireDate: '2025年12月31日', color: 'var(--accent-blue)' },
+          { title: 'Token输出量', value: '234,560', total: '500,000', percent: 46.9, expireDate: '2025年12月31日', color: 'var(--accent-green)' },
+        ]);
+      });
+    }
+
+    function renderDiskStats(stats) {
+      var container = document.getElementById('disk-usage-grid');
+      if (!container || !stats) return;
+      container.innerHTML = stats.map(function(s) {
+        return '<div class="disk-usage-item">' +
+          '<div class="usage-title">' + s.title + '</div>' +
+          '<div class="usage-value">' + s.value + '</div>' +
+          '<div style="font-size:13px;color:var(--text-muted);">/ ' + s.total + '</div>' +
+          '<div class="progress-bar"><div class="progress-fill" style="width:' + s.percent + '%;background:' + (s.color || 'var(--accent-purple)') + '"></div></div>' +
+          '<div class="usage-expire">有效期至 ' + s.expireDate + '</div>' +
+          '</div>';
+      }).join('');
+    }
+
     // ==================== INIT ====================
     // Expand storage price estimation
     document.getElementById('expand-storage-select').addEventListener('change', updateExpandEstimate);
     document.getElementById('expand-duration-select').addEventListener('change', updateExpandEstimate);
     renderTree();
+    loadEnterpriseDiskData();
   </script>
     <script src="../js/modal.js"></script>
   </body>

@@ -433,13 +433,83 @@ app.get('/api/inference', verifyToken, (_req, res) => {
 // GET /api/ai-models
 app.get('/api/ai-models', verifyToken, (_req, res) => {
   const data = {
-    overvieStats: { weeklyCalls: 35190, totalModels: '3/5', running: 1, abnormal: 1, revenue: 4536.99 },
+    overviewStats: {
+      deployed: '3/5',
+      running: 1,
+      abnormal: 1,
+      revenue: 977355.69,
+      distribution: [
+        { name: 'Labels', color: '#6366f1', value: 30 },
+        { name: 'Labels', color: '#3b82f6', value: 25 },
+        { name: 'Labels', color: '#10b981', value: 20 },
+        { name: 'Labels', color: '#8b5cf6', value: 15 },
+        { name: 'Labels', color: '#06b6d4', value: 7 },
+        { name: 'Labels', color: '#f59e0b', value: 3 },
+      ]
+    },
+    secondaryStats: {
+      weeklyCalls: '35,190 次',
+      topModel: 'Model-X',
+      qpsPeak: '5,775',
+      apiCount: '9',
+    },
     models: [
       { name: 'Model-X', status: 'running', revenue: 2100.50, calls: 12500, createdAt: '2025-05-01' },
       { name: 'Model-NPU-6b', status: 'stopped', revenue: 1567.29, calls: 8920, createdAt: '2025-04-15' },
       { name: 'GLM-4.6', status: 'error', revenue: 869.20, calls: 13770, createdAt: '2025-03-20' },
     ],
     usage: { balance: 355.69, monthlyCost: 1355.69, bill: 1500, cert: 0 },
+  };
+  res.json({ success: true, data });
+});
+
+// ─── 企业云盘 API ─────────────────────────────────────────
+// GET /api/enterprise-disk
+app.get('/api/enterprise-disk', verifyToken, (_req, res) => {
+  const data = {
+    // 页面状态
+    authStatus: 'authed', // 'unauth' | 'authed'
+    // 4个统计卡片
+    stats: [
+      {
+        title: '存储使用情况',
+        value: '539.1 MB',
+        total: '100 GB',
+        percent: 0.5,
+        expireDate: '2025年12月31日',
+        color: 'var(--accent-purple)',
+      },
+      {
+        title: '取回统计',
+        value: '123.3 MB',
+        total: '100 GB',
+        percent: 0.1,
+        expireDate: '2025年12月31日',
+        color: 'var(--accent-blue)',
+      },
+      {
+        title: 'Token输入量',
+        value: '456,780',
+        total: '1,000,000',
+        percent: 45.6,
+        expireDate: '2025年12月31日',
+        color: 'var(--accent-blue)',
+      },
+      {
+        title: 'Token输出量',
+        value: '234,560',
+        total: '500,000',
+        percent: 46.9,
+        expireDate: '2025年12月31日',
+        color: 'var(--accent-green)',
+      },
+    ],
+    // 企业信息
+    enterprise: {
+      code: 'QSCG',
+      name: '杭州七七八八久久有限公司',
+      memberCount: 12,
+    },
   };
   res.json({ success: true, data });
 });

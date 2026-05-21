@@ -250,26 +250,26 @@
         </div>
 
         <!-- 模型概览 -->
-        <div class="overview-stats">
+        <div class="overview-stats" id="overview-stats">
           <div class="stat-item">
             <div class="stat-label">已部署AI模型</div>
-            <div class="stat-value">3/5</div>
+            <div class="stat-value" id="stat-deployed">3/5</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">正在运行数</div>
-            <div class="stat-value">1</div>
+            <div class="stat-value" id="stat-running">1</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">异常模型</div>
-            <div class="stat-value">1 <span class="view-link">查看</span></div>
+            <div class="stat-value" id="stat-abnormal">1 <span class="view-link">查看</span></div>
           </div>
           <div class="stat-item">
             <div class="stat-label">模型收益</div>
-            <div class="stat-value">977,355.69</div>
+            <div class="stat-value" id="stat-revenue">977,355.69</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">调用分布</div>
-            <div class="chart-legend-row" style="margin-top:8px;">
+            <div class="chart-legend-row" style="margin-top:8px;" id="stat-distribution">
               <div class="legend">
                 <div class="legend-item"><div class="legend-dot" style="background:#6366f1"></div>Labels</div>
                 <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>Labels</div>
@@ -283,22 +283,22 @@
           </div>
         </div>
 
-        <div class="secondary-stats">
+        <div class="secondary-stats" id="secondary-stats">
           <div class="stat-item">
             <div class="stat-label">本周总调用数</div>
-            <div class="stat-value">35,190 次</div>
+            <div class="stat-value" id="stat-weekly-calls">35,190 次</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">调用最多模型</div>
-            <div class="stat-value">Model-X</div>
+            <div class="stat-value" id="stat-top-model">Model-X</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">QPS峰值</div>
-            <div class="stat-value">5,775</div>
+            <div class="stat-value" id="stat-qps">5,775</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">接口数</div>
-            <div class="stat-value">9</div>
+            <div class="stat-value" id="stat-api-count">9</div>
           </div>
         </div>
 
@@ -719,10 +719,41 @@
         if (json.success) {
           const d = json.data;
           // 更新概览统计
-          const statsEls = document.querySelectorAll('.overview-stats .stat-value');
-          if (statsEls[0]) statsEls[0].textContent = d.overviewStats.weeklyCalls.toLocaleString() + ' 次';
+          if (d.overviewStats) {
+            const os = d.overviewStats;
+            const deployedEl = document.getElementById('stat-deployed');
+            const runningEl = document.getElementById('stat-running');
+            const abnormalEl = document.getElementById('stat-abnormal');
+            const revenueEl = document.getElementById('stat-revenue');
+            if (deployedEl) deployedEl.textContent = os.deployed || '3/5';
+            if (runningEl) runningEl.textContent = os.running !== undefined ? os.running : '1';
+            if (abnormalEl) abnormalEl.innerHTML = (os.abnormal !== undefined ? os.abnormal : '1') + ' <span class="view-link">查看</span>';
+            if (revenueEl) revenueEl.textContent = os.revenue !== undefined ? os.revenue.toLocaleString() : '977,355.69';
+            // 更新调用分布
+            if (os.distribution && os.distribution.length > 0) {
+              const distContainer = document.getElementById('stat-distribution');
+              if (distContainer) {
+                const legendHtml = os.distribution.map(function(item) {
+                  return '<div class="legend-item"><div class="legend-dot" style="background:' + item.color + '"></div>' + item.name + '</div>';
+                }).join('');
+                distContainer.innerHTML = '<div class="legend">' + legendHtml + '</div><div class="pie-placeholder" style="width:80px;height:80px;"></div>';
+              }
+            }
+          }
+          // 更新次要统计
+          if (d.secondaryStats) {
+            const ss = d.secondaryStats;
+            const weeklyEl = document.getElementById('stat-weekly-calls');
+            const topModelEl = document.getElementById('stat-top-model');
+            const qpsEl = document.getElementById('stat-qps');
+            const apiCountEl = document.getElementById('stat-api-count');
+            if (weeklyEl) weeklyEl.textContent = ss.weeklyCalls || '35,190 次';
+            if (topModelEl) topModelEl.textContent = ss.topModel || 'Model-X';
+            if (qpsEl) qpsEl.textContent = ss.qpsPeak || '5,775';
+            if (apiCountEl) apiCountEl.textContent = ss.apiCount || '9';
+          }
           // 更新模型表格
-          renderModelTable(d.models);
+          if (d.models) renderModelTable(d.models);
         }
       } catch(e) { console.error('加载 AI 模型数据失败', e); }
     }
