@@ -365,6 +365,70 @@ app.get('/api/resource-stats', verifyToken, (_req, res) => {
   res.json({ success: true, data: stats });
 });
 
+// ─── 存储管理 API ─────────────────────────────────────────
+// GET /api/storage
+app.get('/api/storage', verifyToken, (_req, res) => {
+  const data = {
+    storage: {
+      used: '539.1 M',
+      total: '100G',
+      expiryDate: '2027-05-20',
+      weeklyUpload: '539.1 M',
+      readCount: 3767,
+    },
+    retrieval: {
+      used: '239.1 M',
+      total: '100G',
+      expiryDate: '2027-05-20',
+      weeklyRetrieval: '44.8 M',
+      readCount: 2213,
+    },
+    deposit: {
+      balance: 2000.00,
+      monthlySpent: 159.88,
+      totalSpent: 159.88,
+    },
+    depositStats: {
+      count: '12.6M',
+      unitPrice: 0.03,
+      weeklyCount: '0.8 M',
+      monthlyCost: 200.00,
+      verifyCount: 210,
+    },
+    realtimeProof: {
+      totalCopies: 895,
+      unitPrice: 2,
+      weeklyCount: 57,
+      monthlyCost: 200.00,
+      downloadCount: 210,
+    },
+    officialCert: {
+      totalCopies: 14,
+      unitPrice: 1200,
+      weeklyCount: 0,
+      monthlyCost: 0.00,
+      verifyCount: 32,
+    },
+  };
+  res.json({ success: true, data });
+});
+
+// ─── 推理服务 API ─────────────────────────────────────────
+// GET /api/inference
+app.get('/api/inference', verifyToken, (_req, res) => {
+  const data = {
+    overviewStats: { deployed: '3/5', running: 1, abnormal: 1, cost: 1355.69 },
+    secondaryStats: { weeklyCalls: 35190, qpsPeak: 5775, successRate: 99.8, avgResponse: 120 },
+    apis: [
+      { modelName: 'gemma-3:7b-it-q4_k_m', name: '推理接口-01', status: 'running', apiKey: 'sk-7e3c...05b85', createdAt: '2025-05-01', expiryAt: '2025-12-31' },
+      { modelName: 'Model-NPU-6b', name: '推理接口-02', status: 'stopped', apiKey: 'sk-a1b2...c3d4e', createdAt: '2025-04-15', expiryAt: '2025-12-31' },
+      { modelName: 'GLM-4.6', name: '推理接口-03', status: 'error', apiKey: 'sk-f5g6...h7i8j', createdAt: '2025-03-20', expiryAt: '2025-12-31' },
+    ],
+    qpsLimit: 1000,
+  };
+  res.json({ success: true, data });
+});
+
 // ─── 404 兜底 ───────────────────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: '接口不存在' });

@@ -111,9 +111,9 @@
             <button class="btn btn-sm btn-primary" onclick="openBuyModal('存储')">立即购买</button>
           </div>
           <div class="stats-row">
-            <div class="stat-box"><div class="stat-label">存储容量统计</div><div class="stat-value">539.1 M/100G</div><div class="stat-sub">到期时间:2027年5月20日</div></div>
-            <div class="stat-box"><div class="stat-label">七日上传量统计</div><div class="stat-value">539.1 M</div></div>
-            <div class="stat-box"><div class="stat-label">读取次数</div><div class="stat-value">3767</div></div>
+            <div class="stat-box"><div class="stat-label">存储容量统计</div><div class="stat-value" id="stor-used">539.1 M/100G</div><div class="stat-sub">到期时间:<span id="stor-expiry">2027年5月20日</span></div></div>
+            <div class="stat-box"><div class="stat-label">七日上传量统计</div><div class="stat-value" id="stor-weekly-upload">539.1 M</div></div>
+            <div class="stat-box"><div class="stat-label">读取次数</div><div class="stat-value" id="stor-read-count">3767</div></div>
           </div>
           <div class="stat-label" style="margin-bottom:8px;">存储趋势统计</div>
           <div class="chart-area">
@@ -136,9 +136,9 @@
             <button class="btn btn-sm btn-primary" onclick="openBuyModal('取回')">立即购买</button>
           </div>
           <div class="stats-row">
-            <div class="stat-box"><div class="stat-label">取回容量统计</div><div class="stat-value">239.1 M/100G</div><div class="stat-sub">到期时间:2027年5月20日</div></div>
-            <div class="stat-box"><div class="stat-label">七日取回量统计</div><div class="stat-value">44.8 M</div></div>
-            <div class="stat-box"><div class="stat-label">读取次数</div><div class="stat-value">2213</div></div>
+            <div class="stat-box"><div class="stat-label">取回容量统计</div><div class="stat-value" id="retr-used">239.1 M/100G</div><div class="stat-sub">到期时间:<span id="retr-expiry">2027年5月20日</span></div></div>
+            <div class="stat-box"><div class="stat-label">七日取回量统计</div><div class="stat-value" id="retr-weekly">44.8 M</div></div>
+            <div class="stat-box"><div class="stat-label">读取次数</div><div class="stat-value" id="retr-read-count">2213</div></div>
           </div>
           <div class="stat-label" style="margin-bottom:8px;">存储趋势统计</div>
           <div class="chart-area">
@@ -161,8 +161,8 @@
             <button class="btn btn-sm btn-primary" onclick="openRechargeModal()">立即充值</button>
           </div>
           <div class="balance-bar">
-            <div class="balance-info"><div class="balance-label">当前账户余额</div><div class="balance-value">¥ 2,000.00</div></div>
-            <div class="balance-side"><div class="balance-side-item">本月已消费：¥159.88</div><div class="balance-side-item">累计已消费：¥159.88</div></div>
+            <div class="balance-info"><div class="balance-label">当前账户余额</div><div class="balance-value" id="deposit-balance">¥ 2,000.00</div></div>
+            <div class="balance-side"><div class="balance-side-item">本月已消费：<span id="deposit-monthly">¥159.88</span></div><div class="balance-side-item">累计已消费：<span id="deposit-total">¥159.88</span></div></div>
           </div>
         </div>
 
@@ -171,9 +171,9 @@
         <div class="section">
           <div class="section-header"><div class="section-title">数据存证</div></div>
           <div class="stats-row">
-            <div class="stat-box"><div class="stat-label">存证条数统计</div><div class="stat-value">12.6M</div><div class="stat-sub">单价:0.03元/条</div></div>
-            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value">0.8 M</div><div class="stat-sub">本月消费:¥200.00</div></div>
-            <div class="stat-box"><div class="stat-label">出证次数</div><div class="stat-value">210</div><div class="stat-sub">免费</div></div>
+            <div class="stat-box"><div class="stat-label">存证条数统计</div><div class="stat-value" id="dp-count">12.6M</div><div class="stat-sub">单价:0.03元/条</div></div>
+            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value" id="dp-weekly">0.8 M</div><div class="stat-sub">本月消费:<span id="dp-monthly-cost">¥200.00</span></div></div>
+            <div class="stat-box"><div class="stat-label">出证次数</div><div class="stat-value" id="dp-verify">210</div><div class="stat-sub">免费</div></div>
           </div>
         </div>
 
@@ -182,9 +182,9 @@
         <div class="section">
           <div class="section-header"><div class="section-title">实时出证</div></div>
           <div class="stats-row">
-            <div class="stat-box"><div class="stat-label">累计出证份数</div><div class="stat-value">895 份</div><div class="stat-sub">单价:2元/份</div></div>
-            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value">57 份</div><div class="stat-sub">本月消费:¥200.00</div></div>
-            <div class="stat-box"><div class="stat-label">下载次数</div><div class="stat-value">210</div><div class="stat-sub">免费</div></div>
+            <div class="stat-box"><div class="stat-label">累计出证份数</div><div class="stat-value" id="rp-total">895 份</div><div class="stat-sub">单价:2元/份</div></div>
+            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value" id="rp-weekly">57 份</div><div class="stat-sub">本月消费:<span id="rp-monthly-cost">¥200.00</span></div></div>
+            <div class="stat-box"><div class="stat-label">下载次数</div><div class="stat-value" id="rp-download">210</div><div class="stat-sub">免费</div></div>
           </div>
         </div>
 
@@ -193,9 +193,9 @@
         <div class="section">
           <div class="section-header"><div class="section-title">正式公证书</div></div>
           <div class="stats-row">
-            <div class="stat-box"><div class="stat-label">累计公证书份数</div><div class="stat-value">14 份</div><div class="stat-sub">单价:1200元/份</div></div>
-            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value">0 份</div><div class="stat-sub">本月消费:¥00.00</div></div>
-            <div class="stat-box"><div class="stat-label">核验次数</div><div class="stat-value">32</div><div class="stat-sub">免费</div></div>
+            <div class="stat-box"><div class="stat-label">累计公证书份数</div><div class="stat-value" id="oc-total">14 份</div><div class="stat-sub">单价:1200元/份</div></div>
+            <div class="stat-box"><div class="stat-label">七日存证量统计</div><div class="stat-value" id="oc-weekly">0 份</div><div class="stat-sub">本月消费:<span id="oc-monthly-cost">¥00.00</span></div></div>
+            <div class="stat-box"><div class="stat-label">核验次数</div><div class="stat-value" id="oc-verify">32</div><div class="stat-sub">免费</div></div>
           </div>
         </div>
       </main>
@@ -303,10 +303,48 @@
   <script src="../js/auth.js"></script>
   <script>checkAuth();</script>
   <script>
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
+    // ── 加载存储管理数据 ──────────────────────────────────────
+    async function loadStorageData() {
+      try {
+        const token = localStorage.getItem('halome_token');
+        const res = await fetch('/api/storage', { headers: { 'Authorization': `Bearer ${token}` } });
+        const json = await res.json();
+        if (json.success) {
+          const d = json.data;
+          // 存储统计
+          document.getElementById('stor-used').textContent = d.storage.used + '/' + d.storage.total;
+          document.getElementById('stor-expiry').textContent = d.storage.expiryDate.replace(/-/g, '年').replace(/(\d{2})$/, '$1日');
+          document.getElementById('stor-weekly-upload').textContent = d.storage.weeklyUpload;
+          document.getElementById('stor-read-count').textContent = d.storage.readCount;
+          // 取回统计
+          document.getElementById('retr-used').textContent = d.retrieval.used + '/' + d.retrieval.total;
+          document.getElementById('retr-expiry').textContent = d.retrieval.expiryDate.replace(/-/g, '年').replace(/(\d{2})$/, '$1日');
+          document.getElementById('retr-weekly').textContent = d.retrieval.weeklyRetrieval;
+          document.getElementById('retr-read-count').textContent = d.retrieval.readCount;
+          // 存证管理
+          document.getElementById('deposit-balance').textContent = '¥ ' + d.deposit.balance.toFixed(2);
+          document.getElementById('deposit-monthly').textContent = '¥' + d.deposit.monthlySpent.toFixed(2);
+          document.getElementById('deposit-total').textContent = '¥' + d.deposit.totalSpent.toFixed(2);
+          // 数据存证
+          document.getElementById('dp-count').textContent = d.depositStats.count;
+          document.getElementById('dp-weekly').textContent = d.depositStats.weeklyCount;
+          document.getElementById('dp-monthly-cost').textContent = '¥' + d.depositStats.monthlyCost.toFixed(2);
+          document.getElementById('dp-verify').textContent = d.depositStats.verifyCount;
+          // 实时出证
+          document.getElementById('rp-total').textContent = d.realtimeProof.totalCopies + ' 份';
+          document.getElementById('rp-weekly').textContent = d.realtimeProof.weeklyCount + ' 份';
+          document.getElementById('rp-monthly-cost').textContent = '¥' + d.realtimeProof.monthlyCost.toFixed(2);
+          document.getElementById('rp-download').textContent = d.realtimeProof.downloadCount;
+          // 正式公证书
+          document.getElementById('oc-total').textContent = d.officialCert.totalCopies + ' 份';
+          document.getElementById('oc-weekly').textContent = d.officialCert.weeklyCount + ' 份';
+          document.getElementById('oc-monthly-cost').textContent = '¥' + d.officialCert.monthlyCost.toFixed(2);
+          document.getElementById('oc-verify').textContent = d.officialCert.verifyCount;
+        }
+      } catch(e) { console.error('加载存储数据失败', e); }
+    }
 
+    // ── Toast 提示 ───────────────────────────────────────
     function showToast(message, type) {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -383,6 +421,9 @@
       closeModal('modal-recharge');
       showToast('充值成功！已到账 ¥' + rechargeAmount.toFixed(2), 'success');
     }
+
+    // ── 初始化 ────────────────────────────────────────────
+    loadStorageData();
   </script>
     <script src="../js/modal.js"></script>
   </body>

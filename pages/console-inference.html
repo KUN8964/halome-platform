@@ -183,38 +183,38 @@
         <div class="overview-stats">
           <div class="stat-item">
             <div class="stat-label">已部署AI模型</div>
-            <div class="stat-value">3/5</div>
+            <div class="stat-value" id="inf-deployed">3/5</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">正在运行数</div>
-            <div class="stat-value">1</div>
+            <div class="stat-value" id="inf-running">1</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">异常模型</div>
-            <div class="stat-value">1</div>
+            <div class="stat-value" id="inf-abnormal">1</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">消费金额</div>
-            <div class="stat-value">¥ 1,355.69</div>
+            <div class="stat-value" id="inf-cost">¥ 1,355.69</div>
           </div>
         </div>
 
         <div class="secondary-stats">
           <div class="stat-item">
             <div class="stat-label">1周调用量</div>
-            <div class="stat-value">35,190 次</div>
+            <div class="stat-value" id="inf-weekly-calls">35,190 次</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">QPS峰值</div>
-            <div class="stat-value">5,775</div>
+            <div class="stat-value" id="inf-qps-peak">5,775</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">成功率</div>
-            <div class="stat-value">99.8%</div>
+            <div class="stat-value" id="inf-success">99.8%</div>
           </div>
           <div class="stat-item">
             <div class="stat-label">平均响应时长</div>
-            <div class="stat-value">120ms</div>
+            <div class="stat-value" id="inf-avg-response">120ms</div>
           </div>
         </div>
 
@@ -233,7 +233,7 @@
                 <th>操作</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="inf-api-tbody">
               <tr>
                 <td class="model-name">gemma3:7b-it-q4_k_m</td>
                 <td class="cell-muted">推理接口-01</td>
@@ -291,7 +291,7 @@
           <div class="qps-header">
             <div>
               <div class="qps-title">设置限额</div>
-              <div class="qps-value">当前QPS上限：1000</div>
+              <div class="qps-value">当前QPS上限：<span id="inf-qps-limit">1000</span></div>
             </div>
           </div>
           <div class="option-group">
@@ -353,6 +353,57 @@
   <script src="../js/auth.js"></script>
   <script>checkAuth();</script>
   <script>
+    // ── 加载推理服务数据 ──────────────────────────────────────
+    async function loadInferenceData() {
+      try {
+        const token = localStorage.getItem('halome_token');
+        const res = await fetch('/api/inference', { headers: { 'Authorization': `Bearer ${token}` } });
+        const json = await res.json();
+        if (json.success) {
+          const d = json.data;
+          // 更新概览统计
+          document.getElementById('inf-deployed').textContent = d.overviewStats.deployed;
+          document.getElementById('inf-running').textContent = d.overviewStats.running;
+          document.getElementById('inf-abnormal').textContent = d.overviewStats.abnormal;
+          document.getElementById('inf-cost').textContent = '¥ ' + d.overviewStats.cost.toFixed(2);
+          // 更新次要统计
+          document.getElementById('inf-weekly-calls').textContent = d.secondaryStats.weeklyCalls.toLocaleString() + ' 次';
+          document.getElementById('inf-qps-peak').textContent = d.secondaryStats.qpsPeak.toLocaleString();
+          document.getElementById('inf-success').textContent = d.secondaryStats.successRate + '%';
+          document.getElementById('inf-avg-response').textContent = d.secondaryStats.avgResponse + 'ms';
+          // 更新QPS限制
+          document.getElementById('inf-qps-limit').textContent = d.qpsLimit;
+          // 重新渲染API表格
+          renderApiTable(d.apis);
+        }
+      } catch(e) { console.error('加载推理数据失败', e); }
+    }
+
+    function renderApiTable(apis) {
+      const tbody = document.getElementById('inf-api-tbody');
+      tbody.innerHTML = apis.map(a => `
+        <tr>
+          <td class="model-name">${a.modelName}</td>
+          <td class="cell-muted">${a.name}</td>
+          <td>
+            <span class="status-text"><span class="status-dot ${a.status}"></span>${statusText(a.status)}</span>
+          </td>
+          <td class="apikey-cell">${a.apiKey}</td>
+          <td class="cell-muted">${a.createdAt}</td>
+          <td class="cell-muted">${a.expiryAt}</td>
+          <td>
+            <div class="action-links">
+              <a>${a.status === 'running' ? '停止' : a.status === 'stopped' ? '启用' : '重启'}</a>
+              <a>设置</a>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function statusText(s) { return { running: '运行中', stopped: '未运行', error: '异常' }[s] || s; }
+
+    // ── QPS 设置 ──────────────────────────────────────
     document.querySelectorAll('.option-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         if (this.textContent.trim() === '自定义') { openModal('modal-qps'); return; }
@@ -360,11 +411,7 @@
         this.classList.add('active');
       });
     });
-    // 立即充值按钮
     document.querySelector('.btn-primary').addEventListener('click', () => openModal('modal-recharge'));
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
     function confirmQPS() {
       const v = parseInt(document.getElementById('qps-input').value);
       if (!v||v<1) { document.getElementById('qps-error').classList.add('show'); return; }
@@ -372,10 +419,13 @@
       closeModal('modal-qps');
       showToast('QPS 限制已设置为 ' + v, 'success');
     }
-    // 充值逻辑
+
+    // ── 充值逻辑 ──────────────────────────────────────
     let rAmount = 500;
     function selectROption(el, amt) { document.querySelectorAll('.recharge-option').forEach(o => o.classList.remove('selected')); el.classList.add('selected'); rAmount = amt; }
     function confirmRecharge() { closeModal('modal-recharge'); showToast('充值成功！已到账 ¥' + rAmount, 'success'); }
+
+    // ── Toast 提示 ──────────────────────────────────────
     function showToast(m, t) {
       const c = document.getElementById('toast-container'), d = document.createElement('div');
       d.className = 'toast ' + (t||'info');
@@ -383,6 +433,9 @@
       c.appendChild(d);
       setTimeout(() => { d.style.opacity = '0'; d.style.transform = 'translateX(20px)'; setTimeout(() => d.remove(), 300); }, 2500);
     }
+
+    // ── 初始化 ────────────────────────────────────────────
+    loadInferenceData();
   </script>
 
   <div class="toast-container" id="toast-container"></div>
