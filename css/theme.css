@@ -341,7 +341,56 @@ a.nav-item {
 .content-area {
   flex: 1;
   padding: var(--content-padding);
+}
+
+/* Inner content wrapper (for pages that need max-width constraint) */
+.content-inner {
   max-width: 1200px;
+}
+
+/* ── Page Top Info Bar (统一顶部信息栏) ─────────────── */
+.page-info-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-secondary);
+  margin-bottom: 24px;
+}
+.page-info-bar .info-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.page-info-bar .info-value {
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.page-info-bar .info-action {
+  justify-self: end;
+}
+
+/* ── Page Divider (统一分割线) ─────────────────────── */
+.page-divider {
+  border: none;
+  border-top: 1px solid var(--border-secondary);
+  margin: 24px 0;
+}
+
+/* ── Card Flush (卡片内容贴边，用于表格等) ─────────────── */
+.card-flush {
+  padding: 0;
+  overflow: hidden;
+}
+.card-flush .card-header {
+  padding: var(--card-padding) var(--card-padding) 0;
+}
+.card-flush .card-body {
+  padding: 0 var(--card-padding);
+}
+.card-flush .card-footer {
+  padding: 0 var(--card-padding) var(--card-padding);
 }
 
 .page-title {
@@ -350,6 +399,15 @@ a.nav-item {
   margin-bottom: 24px;
   color: var(--text-primary);
 }
+
+/* ── Page Header (统一页面头部) ──────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.page-header .page-title { margin-bottom: 0; }
 
 .page-subtitle {
   font-size: 13px;
