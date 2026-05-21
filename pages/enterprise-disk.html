@@ -434,15 +434,15 @@
                 <div class="org-detail-row">
                   <span class="detail-label">组织管理</span>
                   <span>
-                    <a class="detail-link" onclick="openAddMemberModal()">添加成员</a>
-                    <a class="detail-link" style="margin-left:12px;">权限设置</a>
+                    <a class="detail-link" href="javascript:void(0)" onclick="openEnterpriseAddMember()">添加成员</a>
+                    <a class="detail-link" href="javascript:void(0)" style="margin-left:12px;" onclick="openPermissionModal()">权限设置</a>
                   </span>
                 </div>
                 <div class="org-detail-row">
                   <span class="detail-label">云盘空间</span>
                   <span>
-                    <a class="detail-link">扩容空间</a>
-                    <a class="detail-link" style="margin-left:12px;">关闭空间</a>
+                    <a class="detail-link" href="javascript:void(0)" onclick="openExpandStorageModal()">扩容空间</a>
+                    <a class="detail-link" href="javascript:void(0)" style="margin-left:12px;" onclick="openCloseSpaceModal()">关闭空间</a>
                   </span>
                 </div>
               </div>
@@ -575,6 +575,144 @@
       <div class="modal-actions">
         <button class="btn btn-ghost" onclick="closeModal('modal-add-member')">取消</button>
         <button class="btn btn-primary" onclick="confirmAddMember()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 企业级添加成员 Modal（选择目标部门） -->
+  <div class="modal-overlay" id="modal-enterprise-add-member" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">添加成员</h3>
+        <button class="modal-close" onclick="closeModal('modal-enterprise-add-member')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label class="form-label">目标部门</label>
+          <select class="form-select" id="ent-dept-select"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">成员姓名</label>
+          <input class="form-input" id="ent-member-name-input" placeholder="请输入成员姓名" maxlength="10">
+          <div class="form-error" id="ent-member-name-error">请输入成员姓名</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-enterprise-add-member')">取消</button>
+        <button class="btn btn-primary" onclick="confirmEnterpriseAddMember()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 权限设置 Modal -->
+  <div class="modal-overlay" id="modal-permission" style="display:none;">
+    <div class="modal" style="min-width:480px;">
+      <div class="modal-header">
+        <h3 class="modal-title">权限设置</h3>
+        <button class="modal-close" onclick="closeModal('modal-permission')">✕</button>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.7;">
+        <p style="margin-bottom:16px;">当前组织「<strong id="perm-org-name" style="color:var(--text-primary);">杭州七七八八久久有限公司</strong>」的角色与权限：</p>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;">
+          <thead><tr>
+            <th style="text-align:left;padding:8px 12px;background:var(--bg-table-header);color:var(--text-primary);font-weight:500;border-bottom:1px solid var(--border-secondary);">角色</th>
+            <th style="text-align:left;padding:8px 12px;background:var(--bg-table-header);color:var(--text-primary);font-weight:500;border-bottom:1px solid var(--border-secondary);">成员</th>
+            <th style="text-align:left;padding:8px 12px;background:var(--bg-table-header);color:var(--text-primary);font-weight:500;border-bottom:1px solid var(--border-secondary);">权限范围</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td style="padding:10px 12px;color:var(--text-primary);font-weight:500;border-bottom:1px solid var(--border-secondary);">🔧 管理员</td>
+              <td style="padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border-secondary);">2 人</td>
+              <td style="padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border-secondary);">全部权限（管理、读写、删除）</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;color:var(--text-primary);font-weight:500;border-bottom:1px solid var(--border-secondary);">✏️ 编辑者</td>
+              <td style="padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border-secondary);">5 人</td>
+              <td style="padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border-secondary);">读写权限（上传、下载、修改）</td>
+            </tr>
+            <tr>
+              <td style="padding:10px 12px;color:var(--text-primary);font-weight:500;border-bottom:1px solid var(--border-secondary);">👁️ 只读者</td>
+              <td style="padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border-secondary);">5 人</td>
+              <td style="padding:10px 12px;color:var(--text-secondary);border-bottom:1px solid var(--border-secondary);">只读权限（浏览、下载）</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-permission')">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 扩容空间 Modal -->
+  <div class="modal-overlay" id="modal-expand-storage" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">扩容空间</h3>
+        <button class="modal-close" onclick="closeModal('modal-expand-storage')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+          <div style="background:var(--bg-input);border-radius:var(--radius-md);padding:12px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">当前容量</div>
+            <div style="font-size:18px;font-weight:600;color:var(--text-primary);">100 GB</div>
+          </div>
+          <div style="background:var(--bg-input);border-radius:var(--radius-md);padding:12px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">已使用</div>
+            <div style="font-size:18px;font-weight:600;color:var(--accent-purple-light);">539.1 MB</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">扩容规格</label>
+          <select class="form-select" id="expand-storage-select">
+            <option value="200">200 GB（¥199/月）</option>
+            <option value="500">500 GB（¥499/月）</option>
+            <option value="1024">1 TB（¥899/月）</option>
+            <option value="5120">5 TB（¥3,999/月）</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">扩容时长</label>
+          <select class="form-select" id="expand-duration-select">
+            <option value="1">1 个月</option>
+            <option value="3">3 个月（9.5折）</option>
+            <option value="6">6 个月（9折）</option>
+            <option value="12">12 个月（8.5折）</option>
+          </select>
+        </div>
+        <div style="text-align:right;margin-top:8px;font-size:13px;color:var(--text-secondary);">
+          预估费用：<strong style="color:var(--accent-purple);font-size:16px;" id="expand-estimate">¥199.00</strong>
+        </div>
+        <div class="form-error" id="expand-storage-error">请选择扩容规格</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-expand-storage')">取消</button>
+        <button class="btn btn-primary" onclick="confirmExpandStorage()">确认扩容</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 关闭空间 Modal -->
+  <div class="modal-overlay" id="modal-close-space" style="display:none;">
+    <div class="modal" style="min-width:420px;">
+      <div class="modal-header">
+        <h3 class="modal-title">关闭空间</h3>
+        <button class="modal-close" onclick="closeModal('modal-close-space')">✕</button>
+      </div>
+      <div class="delete-warning">
+        <div class="warn-icon">🚫</div>
+        <div class="warn-title">确定要关闭云盘空间吗？</div>
+        <div class="warn-desc" style="text-align:left;">
+          关闭后：<br>
+          • 所有文件将在 <strong style="color:var(--accent-red);">30 天</strong> 后被永久删除<br>
+          • 所有成员将无法访问云盘数据<br>
+          • 删除 API Key 将失效，所有 API 调用将被拒绝<br>
+          • 此操作 <strong style="color:var(--accent-red);">不可撤销</strong>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('modal-close-space')">我再想想</button>
+        <button class="btn" style="background:var(--accent-red);color:#fff;" onclick="confirmCloseSpace()">确认关闭</button>
       </div>
     </div>
   </div>
@@ -1010,7 +1148,93 @@
       return false;
     }
 
-    // ==================== STATE SWITCH ====================
+    // ==================== ENTERPRISE ADD MEMBER ====================
+    function openEnterpriseAddMember() {
+      if (!orgData.root) {
+        showToast('请先创建组织', 'error');
+        return;
+      }
+      const select = document.getElementById('ent-dept-select');
+      select.innerHTML = '';
+      function addDeptOptions(node) {
+        if (node.type === 'department') {
+          const opt = document.createElement('option');
+          opt.value = node.id;
+          const depth = node.level - 1;
+          opt.textContent = ' '.repeat(depth) + '📁 ' + node.name + '（' + (node.members ? node.members.length : 0) + '人）';
+          select.appendChild(opt);
+        }
+        if (node.children) node.children.forEach(addDeptOptions);
+      }
+      addDeptOptions(orgData.root);
+      if (select.options.length === 0) {
+        showToast('请先添加部门', 'info');
+        return;
+      }
+      document.getElementById('ent-member-name-input').value = '';
+      document.getElementById('ent-member-name-error').classList.remove('show');
+      openModal('modal-enterprise-add-member');
+      setTimeout(() => document.getElementById('ent-member-name-input').focus(), 100);
+    }
+
+    function confirmEnterpriseAddMember() {
+      const nodeId = document.getElementById('ent-dept-select').value;
+      const name = document.getElementById('ent-member-name-input').value.trim();
+      if (!name) {
+        document.getElementById('ent-member-name-error').classList.add('show');
+        return;
+      }
+      const node = findNode(orgData.root, nodeId);
+      if (!node) return;
+      if (!node.members) node.members = [];
+      node.members.push(name);
+      closeModal('modal-enterprise-add-member');
+      renderTree();
+      showToast(`成员「${name}」已添加到「${node.name}」`, 'success');
+    }
+
+    // ==================== PERMISSION ====================
+    function openPermissionModal() {
+      document.getElementById('perm-org-name').textContent = orgData.root ? orgData.root.name : '当前组织';
+      openModal('modal-permission');
+    }
+
+    // ==================== EXPAND STORAGE ====================
+    function openExpandStorageModal() {
+      document.getElementById('expand-storage-error').classList.remove('show');
+      document.getElementById('expand-storage-select').value = '200';
+      document.getElementById('expand-duration-select').value = '1';
+      updateExpandEstimate();
+      openModal('modal-expand-storage');
+    }
+
+    function updateExpandEstimate() {
+      const spec = parseInt(document.getElementById('expand-storage-select').value) || 200;
+      const duration = parseInt(document.getElementById('expand-duration-select').value) || 1;
+      const basePrices = { 200: 199, 500: 499, 1024: 899, 5120: 3999 };
+      const discounts = { 1: 1, 3: 0.95, 6: 0.9, 12: 0.85 };
+      const basePrice = basePrices[spec] || 199;
+      const total = (basePrice * duration * discounts[duration]).toFixed(2);
+      document.getElementById('expand-estimate').textContent = '¥' + total;
+    }
+
+    function confirmExpandStorage() {
+      const spec = document.getElementById('expand-storage-select').value;
+      const sizeLabel = { '200': '200 GB', '500': '500 GB', '1024': '1 TB', '5120': '5 TB' }[spec] || spec + ' GB';
+      const cost = document.getElementById('expand-estimate').textContent;
+      closeModal('modal-expand-storage');
+      showToast(`空间已扩容至 ${sizeLabel}，费用 ${cost}`, 'success');
+    }
+
+    // ==================== CLOSE SPACE ====================
+    function openCloseSpaceModal() {
+      openModal('modal-close-space');
+    }
+
+    function confirmCloseSpace() {
+      closeModal('modal-close-space');
+      showToast('空间已关闭，数据将在 30 天后清除', 'info');
+    }
     function switchState(state) {
       document.querySelectorAll('.state-toggle .option-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`.state-toggle .option-btn[data-state="${state}"]`).classList.add('active');
@@ -1051,6 +1275,9 @@
     }
 
     // ==================== INIT ====================
+    // Expand storage price estimation
+    document.getElementById('expand-storage-select').addEventListener('change', updateExpandEstimate);
+    document.getElementById('expand-duration-select').addEventListener('change', updateExpandEstimate);
     renderTree();
   </script>
 </body>
