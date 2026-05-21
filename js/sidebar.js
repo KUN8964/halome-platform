@@ -96,13 +96,16 @@
 
   html += `</nav>`;
 
-  // 用户信息区（读取 localStorage 会话）
+  // 用户信息区（读取 JWT Token）
   var userHtml = '';
   try {
-    var session = JSON.parse(localStorage.getItem('halome_session') || 'null');
-    if (session && session.phone) {
-      var masked = session.phone.substring(0, 3) + '****' + session.phone.substring(session.phone.length - 4);
-      userHtml = `
+    var token = localStorage.getItem('halome_token');
+    if (token) {
+      var payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload && payload.phone) {
+        var phone = payload.phone;
+        var masked = phone.substring(0, 3) + '****' + phone.substring(phone.length - 4);
+        userHtml = `
         <div class="sidebar-user">
           <div class="sidebar-user-info">
             <span class="sidebar-user-avatar">👤</span>
@@ -111,6 +114,7 @@
           <a class="sidebar-logout" onclick="window.logout()">退出登录</a>
         </div>
       `;
+      }
     }
   } catch(e) {}
   html += userHtml;

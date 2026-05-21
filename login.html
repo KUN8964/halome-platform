@@ -6,7 +6,7 @@
   <title>登录 - HALOME 光宇开放平台</title>
   <link rel="stylesheet" href="css/theme.css">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
       background: var(--bg-primary);
@@ -142,10 +142,6 @@
       color: var(--text-tertiary);
       line-height: 1.8;
     }
-    .login-footer .code-hint {
-      color: var(--accent-purple-light);
-      font-weight: 500;
-    }
     .toast-container {
       position: fixed;
       top: 20px;
@@ -200,18 +196,17 @@
         <label class="form-label">验证码</label>
         <div class="sms-row">
           <input type="text" class="form-input" id="code" placeholder="请输入验证码" maxlength="6" autocomplete="one-time-code">
-          <button class="sms-btn" id="sms-btn" onclick="sendCode()">获取验证码</button>
+          <button class="sms-btn" id="sms-btn">获取验证码</button>
         </div>
         <div class="form-error" id="code-error">请输入验证码</div>
       </div>
 
       <!-- 登录按钮 -->
-      <button class="btn-login" id="login-btn" onclick="handleLogin()">登 录</button>
+      <button class="btn-login" id="login-btn">登 录</button>
 
       <!-- 底部提示 -->
       <div class="login-footer">
-        首次登录将自动注册<br>
-        测试验证码：<span class="code-hint">123456</span>
+        首次登录将自动注册
       </div>
     </div>
   </div>
@@ -221,127 +216,167 @@
 
   <script src="js/auth.js"></script>
   <script>
-    var countdown = 0;
-    var timer = null;
+    (function() {
+      'use strict';
 
-    function showToast(msg, type) {
-      var container = document.getElementById('toast-container');
-      var toast = document.createElement('div');
-      type = type || 'info';
-      var icon = { success: '✓', error: '✕', info: 'ℹ' }[type] || '';
-      toast.className = 'toast ' + type;
-      toast.innerHTML = '<span>' + icon + '</span><span>' + msg + '</span>';
-      container.appendChild(toast);
-      setTimeout(function () {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(20px)';
-        setTimeout(function () { toast.remove(); }, 300);
-      }, 2500);
-    }
+      var countdown = 0;
+      var timer = null;
 
-    function hideError(id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.remove('show');
-    }
-
-    function showError(id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.add('show');
-    }
-
-    function sendCode() {
-      if (countdown > 0) return;
-
-      var phone = document.getElementById('phone').value.trim();
-      hideError('phone-error');
-
-      if (!/^1[3-9]\d{9}$/.test(phone)) {
-        showError('phone-error');
-        return;
-      }
-
-      // 开始倒计时
-      var btn = document.getElementById('sms-btn');
-      countdown = 60;
-      btn.disabled = true;
-      updateSmsBtn();
-
-      timer = setInterval(function () {
-        countdown--;
-        updateSmsBtn();
-        if (countdown <= 0) {
-          clearInterval(timer);
-          timer = null;
-          btn.disabled = false;
-        }
-      }, 1000);
-
-      showToast('验证码已发送至 ' + phone.substring(0, 3) + '****' + phone.substring(7), 'info');
-      // 自动填入演示验证码（方便测试）
-      setTimeout(function () {
-        document.getElementById('code').value = '123456';
-      }, 500);
-    }
-
-    function updateSmsBtn() {
-      var btn = document.getElementById('sms-btn');
-      if (countdown > 0) {
-        btn.textContent = countdown + 's 后重发';
-      } else {
-        btn.textContent = '获取验证码';
-      }
-    }
-
-    function handleLogin() {
-      var phone = document.getElementById('phone').value.trim();
-      var code = document.getElementById('code').value.trim();
-      var valid = true;
-
-      hideError('phone-error');
-      hideError('code-error');
-
-      if (!/^1[3-9]\d{9}$/.test(phone)) {
-        showError('phone-error');
-        valid = false;
-      }
-
-      if (!code) {
-        showError('code-error');
-        valid = false;
-      }
-
-      if (!valid) return;
-
-      var result = login(phone, code);
-
-      if (result.success) {
-        showToast(result.message, 'success');
-        // 延迟跳转
+      // ── Toast 提示 ──────────────────────────────
+      function showToast(msg, type) {
+        var container = document.getElementById('toast-container');
+        var toast = document.createElement('div');
+        type = type || 'info';
+        var icon = { success: '✓', error: '✕', info: 'ℹ' }[type] || '';
+        toast.className = 'toast ' + type;
+        toast.innerHTML = '<span>' + icon + '</span><span>' + msg + '</span>';
+        container.appendChild(toast);
         setTimeout(function () {
-          window.location.href = 'index.html';
-        }, 800);
-      } else {
-        showToast(result.message, 'error');
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateX(20px)';
+          setTimeout(function () { toast.remove(); }, 300);
+        }, 2500);
       }
-    }
 
-    // 回车键提交
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') {
-        handleLogin();
+      // ── 表单错误提示 ────────────────────────────
+      function hideError(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.remove('show');
       }
-    });
+      function showError(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('show');
+      }
 
-    // 输入时清除错误状态
-    document.getElementById('phone').addEventListener('input', function () {
-      hideError('phone-error');
-    });
-    document.getElementById('code').addEventListener('input', function () {
-      hideError('code-error');
-    });
+      // ── 发送验证码（异步） ──────────────────────
+      document.getElementById('sms-btn').addEventListener('click', function() {
+        if (countdown > 0) return;
 
-    // 自动聚焦
-    document.getElementById('phone').focus();
+        var phone = document.getElementById('phone').value.trim();
+        hideError('phone-error');
+
+        if (!/^1[3-9]\d{9}$/.test(phone)) {
+          showError('phone-error');
+          return;
+        }
+
+        // 禁用按钮，开始倒计时
+        var btn = document.getElementById('sms-btn');
+        btn.disabled = true;
+        countdown = 60;
+        updateSmsBtn();
+
+        timer = setInterval(function () {
+          countdown--;
+          updateSmsBtn();
+          if (countdown <= 0) {
+            clearInterval(timer);
+            timer = null;
+            btn.disabled = false;
+          }
+        }, 1000);
+
+        // 调用后端 API 发送验证码
+        window.sendSmsCode(phone)
+          .then(function(res) {
+            if (res.success) {
+              var tip = '验证码已发送至 ' + phone.substring(0, 3) + '****' + phone.substring(7);
+              // 开发模式下显示验证码（方便测试）
+              if (res.dev_code) {
+                tip += '（开发模式，验证码：' + res.dev_code + '）';
+              }
+              showToast(tip, 'info');
+            } else {
+              showToast(res.message || '发送失败', 'error');
+              // 发送失败，重置倒计时
+              clearInterval(timer);
+              timer = null;
+              countdown = 0;
+              btn.disabled = false;
+              updateSmsBtn();
+            }
+          })
+          .catch(function() {
+            showToast('网络错误，请稍后重试', 'error');
+            clearInterval(timer);
+            timer = null;
+            countdown = 0;
+            btn.disabled = false;
+            updateSmsBtn();
+          });
+      });
+
+      function updateSmsBtn() {
+        var btn = document.getElementById('sms-btn');
+        if (countdown > 0) {
+          btn.textContent = countdown + 's 后重发';
+        } else {
+          btn.textContent = '获取验证码';
+        }
+      }
+
+      // ── 登录（异步） ────────────────────────────
+      document.getElementById('login-btn').addEventListener('click', function() {
+        var phone = document.getElementById('phone').value.trim();
+        var code = document.getElementById('code').value.trim();
+        var valid = true;
+
+        hideError('phone-error');
+        hideError('code-error');
+
+        if (!/^1[3-9]\d{9}$/.test(phone)) {
+          showError('phone-error');
+          valid = false;
+        }
+        if (!code) {
+          showError('code-error');
+          valid = false;
+        }
+        if (!valid) return;
+
+        // 禁用登录按钮，防止重复提交
+        var btn = document.getElementById('login-btn');
+        btn.disabled = true;
+        btn.textContent = '登录中...';
+
+        window.login(phone, code)
+          .then(function(res) {
+            if (res.success) {
+              showToast(res.message || '登录成功', 'success');
+              setTimeout(function() {
+                window.location.href = 'index.html';
+              }, 800);
+            } else {
+              showToast(res.message || '登录失败', 'error');
+              btn.disabled = false;
+              btn.textContent = '登 录';
+            }
+          })
+          .catch(function() {
+            showToast('网络错误，请稍后重试', 'error');
+            btn.disabled = false;
+            btn.textContent = '登 录';
+          });
+      });
+
+      // ── 回车键提交 ──────────────────────────────
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('login-btn').click();
+        }
+      });
+
+      // ── 输入时清除错误状态 ──────────────────────
+      document.getElementById('phone').addEventListener('input', function() {
+        hideError('phone-error');
+      });
+      document.getElementById('code').addEventListener('input', function() {
+        hideError('code-error');
+      });
+
+      // ── 自动聚焦 ────────────────────────────────
+      document.getElementById('phone').focus();
+    })();
   </script>
 </body>
 </html>

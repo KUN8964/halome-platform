@@ -1,16 +1,18 @@
 /**
- * HALOME 光宇开放平台 - 认证模块
- * 纯前端 localStorage 模拟后端
- * 测试验证码：123456
+ * HALOME 光宇开放平台 - 认证模块（前端）
+ * 调用后端 API 完成短信验证码发送、登录/注册、Token 验证
+ * 不再使用 localStorage 伪造认证
  */
 (function () {
   'use strict';
 
-  var SESSION_KEY = 'halome_session';
-  var USERS_KEY = 'halome_users';
-  var DEMO_CODE = '123456';
+  // ── 配置 ─────────────────────────────────────────────────
+  var API_BASE = window.location.origin; // 同域部署时自动匹配
+  // 如果前后端分离部署，改为：var API_BASE = 'http://localhost:3000';
 
-  // ── 内部工具 ──────────────────────
+  var TOKEN_KEY = 'halome_token';
+
+  // ── 工具函数 ─────────────────────────────────────────────
 
   function maskPhone(phone) {
     if (!phone || phone.length < 7) return phone;
@@ -26,86 +28,111 @@
     return './';
   }
 
-  // ── 公开 API ──────────────────────
+  // 带 Token 的 fetch 封装
+  function authFetch(url, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    var token = localStorage.getItem(TOKEN_KEY);
+    if (token) {
+      options.headers['Authorization'] = 'Bearer ' + token;
+    }
+    options.headers['Content-Type'] = options.headers['Content-Type'] || 'application/json';
+    return fetch(url, options);
+  }
 
+  // ── 公开 API ────────────────────────────────────────────
+
+  // 获取当前登录用户信息（从 Token 解析，不存敏感信息）
   window.getSession = function () {
     try {
-      var raw = localStorage.getItem(SESSION_KEY);
-      return raw ? JSON.parse(raw) : null;
+      var token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return null;
+      // 简单解析 JWT payload（不验证签名，仅读内容）
+      var payload = JSON.parse(atob(token.split('.')[1]));
+      return payload;
     } catch (e) {
       return null;
     }
   };
 
+  // 是否已登录（有 Token 且未过期）
   window.isLoggedIn = function () {
-    return !!window.getSession();
+    var session = window.getSession();
+    if (!session) return false;
+    // 检查 exp
+    if (session.exp && session.exp * 1000 < Date.now()) return false;
+    return true;
   };
 
-  window.getUsers = function () {
-    try {
-      var raw = localStorage.getItem(USERS_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      return [];
-    }
+  // 发送短信验证码
+  // 返回：Promise<{ success: boolean, message: string }>
+  window.sendSmsCode = function (phone) {
+    return fetch(API_BASE + '/api/sms/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone })
+    }).then(function (res) { return res.json(); });
   };
 
-  window.isRegistered = function (phone) {
-    var users = window.getUsers();
-    return users.indexOf(phone) !== -1;
-  };
-
-  window.registerUser = function (phone) {
-    var users = window.getUsers();
-    if (users.indexOf(phone) === -1) {
-      users.push(phone);
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-      return true; // 新注册
-    }
-    return false; // 已存在
-  };
-
+  // 手机号 + 验证码登录/注册
+  // 返回：Promise<{ success: boolean, isNew: boolean, message: string, data?: { token: string } }>
   window.login = function (phone, code) {
-    // 校验验证码
-    if (code !== DEMO_CODE) {
-      return { success: false, message: '验证码错误，请重新输入' };
-    }
-
-    // 检查是否为新用户
-    var isNew = window.registerUser(phone);
-
-    // 写入会话
-    var session = {
-      phone: phone,
-      loginAt: Date.now()
-    };
-    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-
-    return {
-      success: true,
-      isNew: isNew,
-      message: isNew ? '注册成功，欢迎加入 HALOME' : '登录成功，欢迎回来'
-    };
+    return fetch(API_BASE + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: phone, code: code })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (result) {
+      if (result.success && result.data && result.data.token) {
+        localStorage.setItem(TOKEN_KEY, result.data.token);
+      }
+      return result;
+    });
   };
 
+  // 登出：清除 Token，可选调用后端登出接口
   window.logout = function () {
-    localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    // 最佳实践中后端应把 Token 加入黑名单，此处仅前端清除
+    fetch(API_BASE + '/api/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + (localStorage.getItem(TOKEN_KEY) || '') }
+    }).catch(function () { /* 忽略网络错误 */ });
     window.location.href = getBasePath() + 'login.html';
   };
 
+  // 页面加载时检查登录状态（除 login.html 外）
   window.checkAuth = function () {
     if (window.location.pathname.endsWith('login.html')) {
       return;
     }
     if (!window.isLoggedIn()) {
       window.location.href = getBasePath() + 'login.html';
+      return;
     }
+    // 可选：调用后端验证 Token 是否仍然有效
+    authFetch(API_BASE + '/api/auth/me')
+      .then(function (res) {
+        if (!res.ok) {
+          localStorage.removeItem(TOKEN_KEY);
+          window.location.href = getBasePath() + 'login.html';
+        }
+      })
+      .catch(function () {
+        // 网络错误时不跳转，允许离线浏览（按需调整）
+      });
   };
 
-  // ── 初始化：绑定全站退出按钮 ──────
+  // 获取认证头（供其他模块调用 API 时使用）
+  window.getAuthHeader = function () {
+    var token = localStorage.getItem(TOKEN_KEY);
+    return token ? { 'Authorization': 'Bearer ' + token } : {};
+  };
+
+  // ── 初始化：绑定全站退出按钮 ──────────────────────────
 
   document.addEventListener('DOMContentLoaded', function () {
-    // 绑定 top-header 的退出按钮
     var btn = document.querySelector('.header-btn[title="退出"]');
     if (btn) {
       btn.addEventListener('click', function () {
