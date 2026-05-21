@@ -38,6 +38,50 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_sms_codes_phone ON sms_codes(phone, created_at DESC);
   CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
+
+  -- 账户表（余额、抵扣券）
+  CREATE TABLE IF NOT EXISTS accounts (
+    user_id INTEGER PRIMARY KEY,
+    balance REAL DEFAULT 0,
+    coupon REAL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+
+  -- 云空间表
+  CREATE TABLE IF NOT EXISTS spaces (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    type TEXT DEFAULT '标准存储',
+    status TEXT DEFAULT '使用中',
+    api_key TEXT,
+    created_at INTEGER DEFAULT (strftime('%s','now')),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+
+  -- AI 模型表
+  CREATE TABLE IF NOT EXISTS ai_models (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    status TEXT DEFAULT '运行中',
+    revenue REAL DEFAULT 0,
+    calls INTEGER DEFAULT 0,
+    created_at INTEGER DEFAULT (strftime('%s','now')),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+
+  -- 企业云盘表
+  CREATE TABLE IF NOT EXISTS enterprise_disks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    enterprise_code TEXT,
+    used_gb REAL DEFAULT 0,
+    total_gb REAL DEFAULT 0,
+    expiry_date TEXT,
+    created_at INTEGER DEFAULT (strftime('%s','now')),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
 `);
 
 const stmtInsertCode = db.prepare(
@@ -185,6 +229,94 @@ app.get('/api/auth/me', verifyToken, (req, res) => {
     success: true,
     data: { phone: user.phone, createdAt: user.created_at, lastLoginAt: user.last_login_at },
   });
+});
+
+// ─── 仪表盘数据 API ───────────────────────────────────────
+// GET /api/dashboard?tab=cloud|ai|disk
+app.get('/api/dashboard', verifyToken, (req, res) => {
+  const { tab = 'cloud' } = req.query;
+  const userId = req.user.userId;
+
+  // 确保账户存在
+  const stmtEnsureAccount = db.prepare(
+    'INSERT OR IGNORE INTO accounts (user_id, balance, coupon) VALUES (?, 1000, 500)'
+  );
+  stmtEnsureAccount.run(userId);
+
+  // 确保演示空间存在
+  const stmtEnsureSpace = db.prepare(
+    'INSERT OR IGNORE INTO spaces (user_id, name, type, status, api_key) VALUES (?, ?, ?, ?, ?)'
+  );
+  stmtEnsureSpace.run(userId, '测试空间', '标准存储', '使用中', 'ak-demo-****');
+
+  // 确保 AI 模型存在
+  const stmtEnsureModel = db.prepare(
+    'INSERT OR IGNORE INTO ai_models (user_id, name, status, revenue, calls) VALUES (?, ?, ?, ?, ?)'
+  );
+  stmtEnsureModel.run(userId, 'Model-X', '运行中', 4536.99, 35190);
+
+  // 确保企业云盘存在
+  const stmtEnsureDisk = db.prepare(
+    'INSERT OR IGNORE INTO enterprise_disks (user_id, enterprise_code, used_gb, total_gb, expiry_date) VALUES (?, ?, ?, ?, ?)'
+  );
+  stmtEnsureDisk.run(userId, 'QSCG', 0, 0, '2027-05-20');
+
+  if (tab === 'cloud') {
+    const account = db.prepare('SELECT * FROM accounts WHERE user_id = ?').get(userId);
+    const spaces = db.prepare('SELECT * FROM spaces WHERE user_id = ?').all(userId);
+    res.json({
+      success: true,
+      data: {
+        userName: '杭州七七八八久久有限公司',
+        loginAccount: req.user.phone,
+        balance: account.balance,
+        coupon: account.coupon,
+        storageUsed: '539.1 M',
+        storageTotal: '100G',
+        retriealUsed: '123.3 M',
+        retriealTotal: '100G',
+        expiryDate: '2025-12-31',
+        spaces: spaces.map(s => ({ name: s.name, type: s.type, status: s.status, apiKey: (s.api_key || '').substring(0, 6) + '****' })),
+        enterpriseCode: db.prepare('SELECT enterprise_code FROM enterprise_disks WHERE user_id = ?').get(userId)?.enterprise_code || '',
+      }
+    });
+  } else if (tab === 'ai') {
+    const models = db.prepare('SELECT * FROM ai_models WHERE user_id = ?').all(userId);
+    const totalCalls = models.reduce((s, m) => s + m.calls, 0);
+    const running = models.filter(m => m.status === '运行中').length;
+    const abnormal = models.filter(m => m.status === '异常').length;
+    res.json({
+      success: true,
+      data: {
+        userName: '杭州七七八八久久有限公司',
+        loginAccount: req.user.phone,
+        balance: db.prepare('SELECT balance FROM accounts WHERE user_id = ?').get(userId)?.balance || 0,
+        coupon: db.prepare('SELECT coupon FROM accounts WHERE user_id = ?').get(userId)?.coupon || 0,
+        deployedModels: `${models.length}/5`,
+        runningModels: running,
+        abnormalModels: abnormal,
+        modelRevenue: models.reduce((s, m) => s + m.revenue, 0).toFixed(2),
+        weeklyCalls: totalCalls,
+        topModel: models.length > 0 ? models[0].name : '-',
+        qpsPeak: 5775,
+      }
+    });
+  } else if (tab === 'disk') {
+    const disk = db.prepare('SELECT * FROM enterprise_disks WHERE user_id = ?').get(userId);
+    res.json({
+      success: true,
+      data: {
+        userName: '杭州七七八八久久有限公司',
+        loginAccount: req.user.phone,
+        enterpriseCode: disk?.enterprise_code || '',
+        diskUsed: disk?.used_gb || 0,
+        diskTotal: disk?.total_gb || 0,
+        diskExpiry: disk?.expiry_date || '',
+      }
+    });
+  } else {
+    res.status(400).json({ success: false, message: '未知 tab' });
+  }
 });
 
 // ─── 404 兜底 ───────────────────────────────────────────────

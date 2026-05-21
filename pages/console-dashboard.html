@@ -153,20 +153,20 @@
           <div class="info-bar">
             <div>
               <div class="info-label">用户名</div>
-              <div class="info-value">杭州七七八八久久有限公司</div>
+              <div class="info-value" id="cloud-user-name">杭州七七八八久久有限公司</div>
             </div>
             <div>
               <div class="info-label">登录账号</div>
-              <div class="info-value">137 0000 1111</div>
+              <div class="info-value" id="cloud-login-account">137 0000 1111</div>
             </div>
             <div>
               <div class="info-label">余额</div>
-              <div class="info-value">¥ 1,000.00 元</div>
+              <div class="info-value" id="cloud-balance">¥ 1,000.00 元</div>
             </div>
             <div style="display:flex;align-items:center;gap:12px;">
               <div>
                 <div class="info-label">抵扣券</div>
-                <div class="info-value">¥ 500.00 元</div>
+                <div class="info-value" id="cloud-coupon">¥ 500.00 元</div>
               </div>
               <button class="btn btn-sm btn-primary" onclick="showModal('modal-exchange')">兑换抵扣券</button>
             </div>
@@ -176,14 +176,14 @@
             <div class="usage-grid">
               <div class="usage-item">
                 <div class="usage-title">已使用存储</div>
-                <div class="usage-value">539.1 M/100G</div>
+                <div class="usage-value" id="cloud-storage-used">539.1 M/100G</div>
                 <div class="progress-bar"><div class="progress-fill" style="width:5%"></div></div>
                 <div class="usage-date">有效期至</div>
                 <div style="font-size:20px;font-weight:600;margin-top:4px;">2025年12月31日</div>
               </div>
               <div class="usage-item">
                 <div class="usage-title">已使用数据取回</div>
-                <div class="usage-value">123.3 M/100G</div>
+                <div class="usage-value" id="cloud-retrieval-used">123.3 M/100G</div>
                 <div class="progress-bar"><div class="progress-fill" style="width:1%"></div></div>
                 <div class="usage-date">有效期至</div>
                 <div style="font-size:20px;font-weight:600;margin-top:4px;">2025年12月31日</div>
@@ -501,7 +501,7 @@
   <script src="../js/auth.js"></script>
   <script>checkAuth();</script>
   <script>
-    // Tab switching
+    // ── Tab 切换 ─────────────────────────────────────────────
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', function() {
         const target = this.dataset.tab;
@@ -509,41 +509,135 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         this.classList.add('active');
         document.getElementById('tab-' + target).classList.add('active');
+        if (!loadedTabs[target]) fetchDashboard(target);
       });
     });
 
-    function showModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    // ── 已加载的 Tab 缓存 ─────────────────────────────────
+    let loadedTabs = {};
 
-    // Close modal on overlay click
+    // ── 获取仪表盘数据 ───────────────────────────────────
+    async function fetchDashboard(tab) {
+      try {
+        const token = localStorage.getItem('halome_token');
+        const res = await fetch(`/api/dashboard?tab=${tab}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const json = await res.json();
+        if (json.success) {
+          loadedTabs[tab] = true;
+          if (tab === 'cloud') renderCloudTab(json.data);
+          if (tab === 'ai') renderAiTab(json.data);
+          if (tab === 'disk') renderDiskTab(json.data);
+        }
+      } catch(e) { console.error('加载仪表盘失败', e); }
+    }
+
+    // ── 渲染云存储空间 Tab ───────────────────────────────
+    function renderCloudTab(d) {
+      const tab = document.getElementById('tab-cloud');
+      tab.querySelector('.info-bar').innerHTML = `
+        <div><div class="info-label">用户名</div><div class="info-value">${d.userName}</div></div>
+        <div><div class="info-label">登录账号</div><div class="info-value">${d.loginAccount}</div></div>
+        <div><div class="info-label">余额</div><div class="info-value">¥ ${d.balance.toFixed(2)} 元</div></div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div><div class="info-label">抵扣券</div><div class="info-value">¥ ${d.coupon.toFixed(2)} 元</div></div>
+          <button class="btn btn-sm btn-primary" onclick="showModal('modal-exchange')">兑换抵扣券</button>
+        </div>`;
+      tab.querySelector('.usage-grid').innerHTML = `
+        <div class="usage-item">
+          <div class="usage-title">已使用存储</div>
+          <div class="usage-value">${d.storageUsed}/${d.storageTotal}</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, parseFloat(d.storageUsed)*100/parseFloat(d.storageTotal||1))}%"></div></div>
+          <div class="usage-date">有效期至</div>
+          <div style="font-size:20px;font-weight:600;margin-top:4px;">${d.expiryDate}</div>
+        </div>
+        <div class="usage-item">
+          <div class="usage-title">已使用数据取回</div>
+          <div class="usage-value">${d.retrievalUsed}/${d.retrievalTotal}</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100, parseFloat(d.retrievalUsed)*100/parseFloat(d.retrievalTotal||1))}%"></div></div>
+          <div class="usage-date">有效期至</div>
+          <div style="font-size:20px;font-weight:600;margin-top:4px;">${d.expiryDate}</div>
+        </div>`;
+      tab.querySelector('.space-list').innerHTML = `
+        <div class="space-list-header">
+          <div>空间名称</div><div>存储类型</div><div>状态</div><div>API Key</div>
+        </div>
+        ${(d.spaces||[]).map(s => `
+        <div class="space-list-row">
+          <div class="space-name">${s.name}</div>
+          <div class="space-type">${s.type}</div>
+          <div class="space-status"><span class="status-dot running"></span>${s.status}</div>
+          <div class="space-action" onclick="showModal('modal-apikey-verify')">查看</div>
+        </div>`).join('')}`;
+      const ec = tab.querySelector('.enterprise-code-section .ec-value');
+      if (ec) ec.textContent = d.enterpriseCode;
+    }
+
+    // ── 渲染 AI 模型空间 Tab ───────────────────────────
+    function renderAiTab(d) {
+      const tab = document.getElementById('tab-ai');
+      tab.querySelector('.info-bar').innerHTML = `
+        <div><div class="info-label">用户名</div><div class="info-value">${d.userName}</div></div>
+        <div><div class="info-label">登录账号</div><div class="info-value">${d.loginAccount}</div></div>
+        <div><div class="info-label">余额</div><div class="info-value">¥ ${d.balance.toFixed(2)} 元</div></div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div><div class="info-label">抵扣券</div><div class="info-value">¥ ${d.coupon.toFixed(2)} 元</div></div>
+          <button class="btn btn-sm btn-primary" onclick="showModal('modal-exchange')">兑换抵扣券</button>
+        </div>`;
+      const statsGrid = tab.querySelectorAll('.ai-stats-grid .stat-value');
+      if (statsGrid[0]) statsGrid[0].textContent = d.deployedModels;
+      if (statsGrid[1]) statsGrid[1].textContent = d.runningModels;
+      if (statsGrid[2]) statsGrid[2].innerHTML = `${d.abnormalModels} <span style="font-size:13px;color:var(--text-link);cursor:pointer;">查看</span>`;
+      if (statsGrid[3]) statsGrid[3].textContent = d.modelRevenue;
+      const weeklyStats = tab.querySelectorAll('[style*="grid-template-columns:repeat(4,1fr)"]:not(.ai-stats-grid) .stat-value');
+      if (weeklyStats[0]) weeklyStats[0].textContent = (d.weeklyCalls||0).toLocaleString() + ' 次';
+      if (weeklyStats[1]) weeklyStats[1].textContent = d.topModel||'-';
+      if (weeklyStats[2]) weeklyStats[2].textContent = (d.qpsPeak||0).toLocaleString();
+      if (weeklyStats[3]) weeklyStats[3].textContent = d.modelRevenue;
+    }
+
+    // ── 渲染企业云盘 Tab ────────────────────────────────
+    function renderDiskTab(d) {
+      const tab = document.getElementById('tab-disk');
+      tab.querySelector('.info-bar').innerHTML = `
+        <div><div class="info-label">用户名</div><div class="info-value">${d.userName}</div></div>
+        <div><div class="info-label">登录账号</div><div class="info-value">${d.loginAccount}</div></div>
+        <div><div class="info-label">企业码</div><div class="info-value">${d.enterpriseCode}</div></div>
+        <div>
+          <div class="info-label">云盘空间</div>
+          <div class="info-value">${d.diskUsed} GB/${d.diskTotal} GB</div>
+          <div class="usage-date">到期时间:${d.diskExpiry||'-'}</div>
+        </div>`;
+    }
+
+    // ── 初始加载 ────────────────────────────────────────
+    fetchDashboard('cloud');
+
+    // ── 点击遮罩关闭弹窗 ──────────────────────────────
     document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none';
+      if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id);
     });
 
-    // 兑换抵扣券
-    function confirmExchange() {
-      closeModal('modal-exchange');
-      alert('✅ 抵扣券兑换成功！');
-    }
+    // ── 兑换抵扣券 ──────────────────────────────────────
+    function confirmExchange() { closeModal('modal-exchange'); alert('✅ 抵扣券兑换成功！'); }
 
-    // 复制 API Key
+    // ── 复制 API Key ────────────────────────────────────
     function copyApiKey() {
       const el = document.querySelector('#modal-apikey-show .apikey-box');
-      if (el) { navigator.clipboard.writeText(el.textContent).then(() => {}).catch(() => {}); }
+      if (el) navigator.clipboard.writeText(el.textContent).catch(()=>{});
     }
 
-    // 创建云空间
-    function confirmCreateSpace() {
-      closeModal('modal-create-space');
-      alert('✅ 云空间创建成功！');
-    }
+    // ── 创建云空间 ──────────────────────────────────────
+    function confirmCreateSpace() { closeModal('modal-create-space'); alert('✅ 云空间创建成功！'); }
 
-    // Code input auto-focus
+    // ── 验证码输入自动跳转焦点 ─────────────────────────
     document.querySelectorAll('.code-inputs input').forEach((input, index, inputs) => {
       input.addEventListener('input', function() {
         if (this.value && index < inputs.length - 1) inputs[index + 1].focus();
       });
     });
   </script>
-</body>
+    <script src="../js/modal.js"></script>
+  </body>
 </html>
