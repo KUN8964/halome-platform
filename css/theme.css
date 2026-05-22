@@ -444,6 +444,10 @@ a.nav-item {
   border-bottom-color: var(--accent-purple);
 }
 
+/* Tab Content */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
 /* Sub Tabs */
 .sub-tabs {
   display: flex;

@@ -395,7 +395,6 @@
   <script>
     // ============ MODAL UTILS ============
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; document.querySelectorAll(`#${id} .form-error`).forEach(e => e.classList.remove('show')); }
     document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
 
     // ============ TOAST ============

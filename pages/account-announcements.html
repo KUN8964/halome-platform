@@ -292,7 +292,6 @@
       showToast('所有消息已标记为已读', 'success');
     });
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     document.addEventListener('click', function(e) { if (e.target.classList.contains('modal-overlay')) e.target.style.display = 'none'; });
     function showToast(m, t) {
       const c = document.getElementById('toast-container'), d = document.createElement('div');

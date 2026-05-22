@@ -381,7 +381,6 @@
       document.getElementById('modal-custom-recharge').style.display = 'flex';
       setTimeout(() => document.getElementById('custom-recharge-input').focus(), 100);
     }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     function confirmCustomRecharge() {
       const amt = parseFloat(document.getElementById('custom-recharge-input').value);
       if (!amt || amt < 1) { document.getElementById('cr-error').classList.add('show'); return; }
